@@ -1,0 +1,27 @@
+{
+  "name": "parser-generator",
+  "version": "1.0.0",
+  "description": "parser generator using parser combinators",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require @babel/register --require @babel/polyfill 'test/**/**.test.js'"
+  },
+  "keywords": [
+    "parser"
+  ],
+  "author": "Jakob Sønderby Kristensen",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "ramda": "^0.27.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/node": "^7.12.6",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/register": "^7.12.1",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1"
+  }
+}

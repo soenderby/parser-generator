@@ -106,11 +106,11 @@ describe('Elementary parsers', () => {
   });
 
   describe('fail', () => {
-    it('should accept input, and return empty object', () => {
+    it('should accept input, and generate nothing', () => {
       const inputString = 'input text';
 
-      const expected = {};
-      const actual = fail(inputString);
+      const expected = [];
+      const actual = [...fail(inputString)];
 
       assert.deepEqual(actual, expected);
     });

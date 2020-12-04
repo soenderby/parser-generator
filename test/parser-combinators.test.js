@@ -26,7 +26,7 @@ describe('Parser combinators', () => {
       const simple = parser(string => tuple( string.slice(0, 1),  string.slice(1)));
       const inputString = "a token";
 
-      const expected = [tuple( tuple('a', ' '), 'token')];
+      const expected = [tuple(tuple('a', ' '), 'token')];
       const actual = [...sequence(simple)(simple)(inputString)];
 
       assert.deepEqual(actual, expected);

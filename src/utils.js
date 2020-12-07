@@ -79,13 +79,9 @@ const concatList = (list1, list2) => function* () {
     else yield iteration.value;
   }
 }
-const concatString = (str1, str2) => {
-  return str1 + str2;
-}
 const concat = piecewise(
   areAllList, concatList,
-  areAllString, concatString,
-  otherwise, notSupportedError
+  otherwise, R.concat
 );
 
 const dropList = (n, list) => function*() {
@@ -125,7 +121,7 @@ const mapList = (f, list) => function* () {
 }
 const map = piecewise(
     (f, obj) => isList(obj), mapList,
-    otherwise, notSupportedError
+    otherwise, R.map
 );
 
 const isEmptyList = (list) => {
@@ -133,38 +129,19 @@ const isEmptyList = (list) => {
     return false;
   return true;
 };
-const isEmptyString = str => {
-  return str.length === 0;
-}
 const isEmpty = piecewise(
   isList, isEmptyList,
-  isString, isEmptyString,
-  otherwise, notSupportedError
+  otherwise, R.isEmpty,
 );
 
-const isNonEmptyList = (list) => {
-  for(let e of list())
-    return true;
-  return false;
-}
-const isNonEmptyString = str => {
-  return str.length !== 0;
-}
-const isNonEmpty = piecewise(
-    isList, isNonEmptyList,
-    isString, isNonEmptyString,
-    otherwise, notSupportedError
-);
+const isNonEmpty = obj => !isEmpty(obj);
 
 const headList = (list) => {
   return list().next().value;
 }
-const headString = (str) => {
-  return str.charAt(0);
-}
 const head = piecewise(
   isList, headList,
-  isString, headString
+  otherwise, R.head
 );
 
 const tailList = (list) => function* (){
@@ -179,13 +156,9 @@ const tailList = (list) => function* (){
     else yield iteration.value;
   }
 }
-const tailString = (str) => {
-  return str.slice(1, str.length);
-}
 const tail = piecewise(
   isList, tailList,
-  isString, tailString,
-  otherwise, notSupportedError
+  otherwise, R.tail
 );
 
 const takeList = (n, list) => function*() {
@@ -199,16 +172,10 @@ const takeList = (n, list) => function*() {
     else yield iteration.value;
   }
 }
-const takeString = (n, str) => {
-  return str.slice(0, n);
-}
 const take = piecewise(
     (n, obj) => isList(obj), takeList,
-    (n, obj) => isString(obj), takeString,
-    otherwise, notSupportedError
+    otherwise, R.take
 );
-
-
 
 /* Tuple methods */
 const fstTuple = t => {

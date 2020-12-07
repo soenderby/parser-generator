@@ -21,15 +21,16 @@ const tuple = (...args) => {
 }
 
 /* Data types (duck typing) */
+const isFunction = obj => typeof obj === 'function';
 const isList = obj => obj.constructor.name === 'GeneratorFunction';
-const isFunction = obj => typeof obj === 'function' && !isList(obj);
 const isString = obj => typeof obj === 'string';
+const isTuple = obj => obj.hasOwnProperty('fst') && obj.hasOwnProperty('snd');
 
 const areAllList = (...args) => args.every(isList);
 const areAllFunction = (...args) => args.every(isFunction);
 const areAllString = (...args) => args.every(isString);
 
-/* Functions */
+/* Common functions */
 // based on https://www.maplesoft.com/support/help/Maple/view.aspx?path=examples%2Fpiecewise
 const piecewise = (...outerArgs) => {
   if (outerArgs.length < 2)
@@ -52,7 +53,9 @@ const piecewise = (...outerArgs) => {
   };
 };
 const otherwise = () => true;
+
 const notSupportedError = obj => { throw `Does not support ${obj}` };
+
 const curry = R.curry;
 
 /* List functions */
@@ -67,6 +70,14 @@ const concatList = (list1, list2) => function* () {
       break;
     else yield iteration.value;
   }
+
+  while(true){
+    let iteration = iterator2.next();
+
+    if (iteration.done)
+      break;
+    else yield iteration.value;
+  }
 }
 const concatString = (str1, str2) => {
   return str1 + str2;
@@ -75,6 +86,30 @@ const concat = piecewise(
   areAllList, concatList,
   areAllString, concatString,
   otherwise, notSupportedError
+);
+
+const dropList = (n, list) => function*() {
+  let iterator = list();
+
+  for(let i = 0; i < n; i++){
+    if(iterator.next().done)
+      break;
+  }
+
+  while(true){
+    let iteration = iterator.next();
+    if(iteration.done)
+      break;
+    else yield iteration.value;
+  }
+}
+const dropString = (n, str) => {
+  return str.slice(n, str.length);
+}
+const drop = piecewise(
+    (n, obj) => isList(obj), dropList,
+    (n, obj) => isString(obj), dropString,
+    otherwise, notSupportedError
 );
 
 const mapList = (f, list) => function* () {
@@ -173,42 +208,42 @@ const take = piecewise(
     otherwise, notSupportedError
 );
 
-const dropList = (n, list) => function*() {
-  let iterator = list();
 
-  for(let i = 0; i < n; i++){
-    if(iterator.next().done)
-      break;
-  }
 
-  while(true){
-    let iteration = iterator.next();
-    if(iteration.done)
-      break;
-    else yield iteration;
-  }
+/* Tuple methods */
+const fstTuple = t => {
+  return t.fst;
 }
-const dropString = (n, str) => {
-  return str.slice(n, str.length);
+const fst = piecewise(
+  isTuple, fstTuple,
+  otherwise, notSupportedError
+);
+
+const sndTuple = t => {
+  return t.snd;
 }
-const drop = piecewise(
-    (n, obj) => isList(obj), dropList,
-    (n, obj) => isString(obj), dropString,
+const snd = piecewise(
+    isTuple, sndTuple,
     otherwise, notSupportedError
 );
 
 export {
-  tuple,
-  map,
-  piecewise,
-  isEmpty,
-  isNonEmpty,
-  head,
-  tail,
-  otherwise,
-  list,
-  emptyList,
-  take,
+  concat,
   drop,
+  emptyList,
+  fst,
+  head,
+  isEmpty,
+  isList,
+  isNonEmpty,
+  isTuple,
+  list,
+  map,
+  otherwise,
+  piecewise,
+  snd,
+  tail,
+  take,
+  tuple,
   curry
 }

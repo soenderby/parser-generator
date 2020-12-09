@@ -51,26 +51,34 @@ describe('Parser combinators', () => {
     });
 
     it('should apply two parsers in sequence', () => {
-      const parseOneItem = parser(string => tuple( string.slice(0, 1), string.slice(1) ));
-
       const inputString = 'ab';
 
-      const expected = [tuple( tuple('a', 'b'), '')];
-      const actual = [...sequence(parseOneItem)(parseOneItem)(inputString)];
+      const expected = list(tuple('', tuple('a', 'b')));
+      const actual = sequence(parseSingleChar)(parseSingleChar)(inputString);
 
-      assert.deepEqual(actual, expected);
+      assertEqualLists(actual, expected);
     });
 
-    it('should work when the parsers return array as result', () => {
-      const parseOneItem = parser(string => tuple( string.slice(0, 1), string.slice(1) ));
-      const fakeParser = parser(string => tuple( ['c', 'c'], '' ));
+    it('should work when the second parser returns multiple results', () => {
+      const fakeParser = string => list(tuple('', list('c', 'c')));
       const inputString = 'a';
 
-      const expected = [tuple( tuple('a', ['c', 'c']), '')];
-      const actual = [...sequence(parseOneItem)(fakeParser)(inputString)];
+      const expected = list(tuple('', tuple('a', list('c', 'c'))));
+      const actual = sequence(parseSingleChar)(fakeParser)(inputString);
 
-      assert.deepEqual(actual, expected);
+      assertEqualLists(actual, expected);
     });
+
+    it('should work when the first parser returns multiple results', () => {
+      const fakeParser = string => list(tuple('a', list('c', 'c')));
+      const inputString = 'a';
+
+      const expected = list(tuple('', tuple(list('c', 'c'), 'a')));
+      const actual = sequence(fakeParser)(parseSingleChar)(inputString);
+
+      assertEqualLists(actual, expected);
+    });
+
   });
 
   describe('alternation', () => {

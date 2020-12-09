@@ -1,23 +1,17 @@
-import { createResult, tuple, concatIfDefined, map } from './utils';
 import { epsilon, succeed } from './elementary-parsers';
 import { apply } from './parser-tranformers';
-import { compose, curry } from 'ramda';
+import { curry } from 'ramda';
+import { tuple, map } from './utils';
 
 // Execute two parsers in sequence. The second is applied to the remainder of the first
-// This will not work if the given parsers can produce multiple results.
-// This might need a refactor of elementary parser to work.
-/*
-const sequence = firstParser => secondParser => string => {
-  const firstResult = firstParser(string);
-  const secondResult = secondParser(firstResult.remainder);
-
-  return createResult({
-    result: [firstResult.result, secondResult.result].flat(),
-    remainder: secondResult.remainder
-  });
-};
-*/
-function* uncurriedSequence(firstParser, secondParser, string) {
+const uncurriedSequence = (firstParser, secondParser, str) => 
+  map( 
+    res => {
+      const secondParse = secondParser(res.fst);
+      tuple(tuple(res.snd, secondParse.snd), secondParse.fst)
+    }
+  , firstParser(str));
+  /*
   const generator1 = firstParser(string);
   
   while(true){
@@ -37,16 +31,11 @@ function* uncurriedSequence(firstParser, secondParser, string) {
         cycle2.value.snd
       );
     }
-  }
-};
+  }*/
 
 const sequence = curry(uncurriedSequence);
 
-//const //uncurriedSequence, sequence / sequence, curriedSequence
-
 // Applies two parsers to the input string, and returns the possible results
-// I believe this has to be altered quite significantly to match the behavior 
-// described in the article, as that describes the implementation in a lazy language
 const uncurriedAlternation = function* (firstParser, secondParser, string) {
   var generator1 = firstParser(string);
   var generator2 = secondParser(string);
@@ -70,7 +59,6 @@ const uncurriedAlternation = function* (firstParser, secondParser, string) {
 const alternation = curry(uncurriedAlternation);
 
 // These applies two parsers in sequence, but only keeps the result of one of them
-// Selecting using array index seems fragile and hard to read
 const seqKeepFirst = firstParser => secondParser => string => {
   return map(
     e => tuple( e.fst.fst, e.snd ), 
@@ -83,7 +71,6 @@ const seqKeepSecond = firstParser => secondParser => string => {
   return tuple( result.fst[1], result.snd );
 }
 
-// Maybe refactor so that this returns a list of all success rather than just the final result
 const many = parser => string => {
   // The one defined in the article does not work here
   // I suspect because javascript is not lazy in the same manner as haskell

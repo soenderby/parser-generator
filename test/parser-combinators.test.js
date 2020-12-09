@@ -1,35 +1,53 @@
 import { assert } from 'chai';
 import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, option, block, listOf, chainLeft, chainRight } from '../src/parser-combinators';
-import { tuple, parser} from '../src/utils';
-import { fail } from '../src/elementary-parsers';
+import { fail, symbol } from '../src/elementary-parsers';
+import {
+  tuple,
+  piecewise,
+  head,
+  tail,
+  isEmpty,
+  isNonEmpty,
+  otherwise,
+  list,
+  emptyList,
+  take,
+  drop,
+  curry
+} from '../src/utils';
+
+const assertEqualLists = (list1, list2) => {
+  assert.deepEqual([...list1()],[...list2()]);
+}
 
 const parseA = string => string.charAt(0) === 'a' ?
-  tuple(
-       string.slice(0, 1),
-       string.slice(1)
-    )
+  list(tuple(
+       tail(string),
+       'a'
+    ))
   :
-  tuple( '', string );
+  emptyList();
 
-const symbol = symbol => string => string.charAt(0) === symbol ?
-  tuple(
-       string.slice(0, 1),
-       string.slice(1)
-    )
+/*const symbol = symbol => string => string.charAt(0) === symbol ?
+  list(tuple(
+       tail(string),
+       symbol
+    ))
   :
-  tuple( '', string );
+  emptyList();
+  */
+
+const parseSingleChar = str => list(tuple(tail(str), head(str)));
 
 describe('Parser combinators', () => {
   describe('sequence', () => {
     it('should apply second parser to remainder of first', () => {
-      // parses a single arbitrary character
-      const simple = parser(string => tuple( string.slice(0, 1),  string.slice(1)));
       const inputString = "a token";
 
-      const expected = [tuple(tuple('a', ' '), 'token')];
-      const actual = [...sequence(simple)(simple)(inputString)];
+      const expected = list(tuple('token', tuple('a', ' ')));
+      const actual = sequence(parseSingleChar, parseSingleChar)(inputString);
 
-      assert.deepEqual(actual, expected);
+      assertEqualLists(actual, expected);
     });
 
     it('should apply two parsers in sequence', () => {

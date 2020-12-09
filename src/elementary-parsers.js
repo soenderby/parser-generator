@@ -1,5 +1,4 @@
 import {
-  createResult,
   tuple,
   piecewise,
   head,

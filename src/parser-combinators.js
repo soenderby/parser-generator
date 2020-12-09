@@ -1,37 +1,32 @@
 import { epsilon, succeed } from './elementary-parsers';
 import { apply } from './parser-tranformers';
-import { curry } from 'ramda';
-import { tuple, map } from './utils';
+import { curry, chain } from 'ramda';
+import { tuple, map, head, fst, snd, list, concat } from './utils';
 
 // Execute two parsers in sequence. The second is applied to the remainder of the first
-const uncurriedSequence = (firstParser, secondParser, str) => 
+/*
+  should return data with structure:
+  list(
+    tuple(
+      second parser remainder,
+      tuple(
+        result of first parser, 
+        result of second parser
+      )
+    )
+    ...
+  )
+*/
+const concatListReducer = (accumulator, element) => concat(accumulator, element);
+const uncurriedSequence = (firstParser, secondParser, str) =>
   map( 
-    res => {
-      const secondParse = secondParser(res.fst);
-      tuple(tuple(res.snd, secondParse.snd), secondParse.fst)
-    }
-  , firstParser(str));
-  /*
-  const generator1 = firstParser(string);
-  
-  while(true){
-    var cycle1 = generator1.next();
-
-    if (cycle1.done)
-      return;
-    
-    var generator2 = secondParser(cycle1.value.snd);
-
-    while(true){
-      var cycle2 = generator2.next(); 
-      if (cycle2.done)
-        break;
-      else yield tuple(
-        tuple(cycle1.value.fst, cycle2.value.fst),
-        cycle2.value.snd
-      );
-    }
-  }*/
+    firstParse => 
+      [...map(
+        secondParse => tuple(secondParse.fst, tuple(firstParse.snd, secondParse.snd))
+        , secondParser(firstParse.fst)
+      )()]
+    , firstParser(str)
+  );
 
 const sequence = curry(uncurriedSequence);
 

@@ -1,4 +1,5 @@
 import * as R from 'ramda';
+import * as chai from 'chai';
 
 /* Data structures */
 const list = (...args) => {
@@ -176,6 +177,42 @@ const take = piecewise(
     (n, obj) => isList(obj), takeList,
     otherwise, R.take
 );
+
+/* Test methods */
+chai.use(function(_chai, utils) {
+  // Overwrites the eql method, which is called recursively by assert.deepEqual, to support list comparisons
+  utils.overwriteMethod(_chai.Assertion.prototype, 'eql', function(_super) {
+    return function(str) {
+      const { object, negate, message } = this.__flags;
+
+      // List elements are only compared when both actual value and expected values are lists
+      if (isList(str) && isList(object)) {
+        const iterator1 = str.apply();
+        const iterator2 = object.apply();
+
+        // As lists can be infinite, the lists are only compared up to 100 elements
+        for(let i = 0; i < 100; i++) {
+          let iteration1 = iterator1.next();
+          let iteration2 = iterator2.next();
+
+          if (iteration1.done || iteration2.done)
+            break;
+
+          // The list elements are compared using
+          if (negate) {
+            new chai.Assertion(iteration1.value, message).to.not.deep.equal(iteration2.value);
+          }
+          else new chai.Assertion(iteration1.value, message).to.deep.equal(iteration2.value);
+        }
+      }
+      // If expected value is list and actual value is not, an error is thrown
+      else if(isList(str) && !negate){
+        chai.assert.fail("#{this} to be a list");
+      }
+      else _super.apply(this, arguments);
+    }
+  })
+});
 
 /* Tuple methods */
 const fstTuple = t => {

@@ -19,15 +19,6 @@ import {
   tuple
 } from '../src/utils';
 
-const assertEqualLists = (actual, expected) => {
-  if(!isList(actual))
-    throw 'actual is not a list';
-  if(!isList(expected))
-    throw  'expected is not a list';
-
-  assert.deepEqual([...actual()],[...expected()]);
-}
-
 describe('Utils', () => {
   /* Data structures */
   describe('list', () => {
@@ -86,14 +77,14 @@ describe('Utils', () => {
       const expected = emptyList();
       const actual = concat(emptyList(), emptyList());
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should return list if given empty list and list', () => {
       const expected = list(0, 1, 2);
       const actual = concat(emptyList(), list(0, 1, 2));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should return combined string if given strings', () => {
@@ -109,7 +100,7 @@ describe('Utils', () => {
       const expected = list(2);
       const actual = drop(2, list(0, 1, 2));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
     it('should return 3..n characters of string if given 2 and string', () => {
       const expected = 'cd';
@@ -176,14 +167,14 @@ describe('Utils', () => {
       const expected = list(1, 2, 3);
       const actual = map(e => e, list(1, 2, 3));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should return modify list if given double function', () => {
       const expected = list(2, 4, 6);
       const actual = map(e => 2*e, list(1, 2, 3));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -192,7 +183,7 @@ describe('Utils', () => {
       const expected = list(1, 2);
       const actual = tail(list(0, 1, 2));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should return 2..n character of a string', () => {
@@ -208,14 +199,14 @@ describe('Utils', () => {
       const expected = list(1, 2);
       const actual = take(2, list(1, 2, 3));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should return 0..0 elements of 1-element list if given 2', () => {
       const expected = list(1);
       const actual = take(2, list(1));
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should return 0..1 characters of 3-characters string if given 2', () => {

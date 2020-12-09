@@ -2,10 +2,6 @@ import { assert } from 'chai';
 import { symbol, token, satisfy, epsilon, succeed, fail } from '../src/elementary-parsers';
 import {tuple, list, emptyList} from '../src/utils';
 
-const assertEqualLists = (list1, list2) => {
-  assert.deepEqual([...list1()],[...list2()]);
-}
-
 describe('Elementary parsers', () => {
   describe('symbol', () => {
     it('should parse a single char', () => {
@@ -15,7 +11,7 @@ describe('Elementary parsers', () => {
       const expected = list(tuple('n input text', charParameter));
       const actual = symbol(charParameter, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should parse symbol, only if it is the first char in string', () => {
@@ -25,7 +21,7 @@ describe('Elementary parsers', () => {
       const expected = emptyList();
       const actual = symbol(charParameter, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should not parse anything if no matching symbol', () => {
@@ -35,7 +31,7 @@ describe('Elementary parsers', () => {
       const expected = emptyList();
       const actual = symbol(charParameter, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -47,7 +43,7 @@ describe('Elementary parsers', () => {
       const expected = list(tuple(' and the rest', tokenParameter ));
       const actual = token(tokenParameter, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should not parse if matching token not at the beginning of input string', () => {
@@ -57,7 +53,7 @@ describe('Elementary parsers', () => {
       const expected = list();
       const actual = token(tokenParameter, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -69,7 +65,7 @@ describe('Elementary parsers', () => {
       const expected = list(tuple('bc', 'a'));
       const actual = satisfy(predicate, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should not apply parser if given function evaluates to false', () => {
@@ -79,7 +75,7 @@ describe('Elementary parsers', () => {
       const expected = list();
       const actual = satisfy(predicate, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -90,7 +86,7 @@ describe('Elementary parsers', () => {
       const expected = list(tuple(inputString, tuple()));
       const actual = epsilon(inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -102,7 +98,7 @@ describe('Elementary parsers', () => {
       const expected = list(tuple(inputString, givenValue));
       const actual = succeed(givenValue, inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -113,7 +109,7 @@ describe('Elementary parsers', () => {
       const expected = list();
       const actual = fail(inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
   });
 });

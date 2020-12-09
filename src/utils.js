@@ -11,6 +11,33 @@ const list = (...args) => {
 }
 const emptyList = () => list();
 
+const recursiveList = (...args) => {
+  if (args.length < 2)
+    throw 'recursiveList expects at least 2 arguments';
+
+  if (!isFunction(args[args.length - 1]))
+    throw 'recursiveList expects last argument to be function';
+
+  return function* () {
+    let baseCases = [];
+    const recursiveCase = args[args.length - 1];
+
+    // Returns a finite sequence of all base cases
+    for (let i = 0; i < args.length - 1; i++){
+      const value = args[i];
+      baseCases[i] = value;
+      yield value;
+    }
+
+    // Returns an infinite sequence of subsequent recursive cases
+    while(true) {
+      const value = recursiveCase.apply(this, baseCases);
+      baseCases = [...baseCases.slice(1), value];
+      yield value;
+    }
+  }
+}
+
 const tuple = (...args) => {
   if (args.length >= 3)
     throw 'tuple only supports up to 2 arguments'
@@ -249,5 +276,6 @@ export {
   tail,
   take,
   tuple,
-  curry
+  curry,
+  recursiveList
 }

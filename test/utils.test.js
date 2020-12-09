@@ -16,7 +16,8 @@ import {
   snd,
   tail,
   take,
-  tuple
+  tuple,
+  recursiveList
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -30,6 +31,31 @@ describe('Utils', () => {
   describe('emptyList', () => {
     it('should satisfy isList', () => {
       assert.isTrue(isList(emptyList()));
+    });
+  });
+
+  describe('recursiveList', () => {
+    it('should satisfy isList', () => {
+      const l = recursiveList(1, n => n);
+      assert.isTrue(isList(l))
+    });
+
+    it('should return list of natural numbers', () => {
+      const expected = list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+      const actual = recursiveList(
+          1,
+          n => n + 1
+      );
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return list of fibonacci numbers', () => {
+      const expected = list(0, 1, 1, 2, 3, 5, 8, 13, 21, 34);
+      const actual = recursiveList(
+          0, 1,
+          (n1, n2) => n1 + n2
+      );
+      assert.deepEqual(actual, expected);
     });
   });
 

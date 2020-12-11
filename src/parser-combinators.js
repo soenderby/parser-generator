@@ -17,14 +17,13 @@ import { tuple, map, head, fst, snd, list, concat, fmap } from './utils';
     ...
   )
 */
-const concatListReducer = (accumulator, element) => concat(accumulator, element);
 const uncurriedSequence = (firstParser, secondParser, str) =>
   fmap(
     t1 => {
       const xs1 = fst(t1);
       const v1 = snd(t1);
 
-      map(
+      return map(
         t2 => {
           const xs2 = fst(t2);
           const v2 = snd(t2);

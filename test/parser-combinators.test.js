@@ -47,7 +47,7 @@ describe('Parser combinators', () => {
       const expected = list(tuple('token', tuple('a', ' ')));
       const actual = sequence(parseSingleChar, parseSingleChar)(inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should apply two parsers in sequence', () => {
@@ -56,7 +56,7 @@ describe('Parser combinators', () => {
       const expected = list(tuple('', tuple('a', 'b')));
       const actual = sequence(parseSingleChar)(parseSingleChar)(inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should work when the second parser returns multiple results', () => {
@@ -66,7 +66,7 @@ describe('Parser combinators', () => {
       const expected = list(tuple('', tuple('a', list('c', 'c'))));
       const actual = sequence(parseSingleChar)(fakeParser)(inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
     it('should work when the first parser returns multiple results', () => {
@@ -76,7 +76,7 @@ describe('Parser combinators', () => {
       const expected = list(tuple('', tuple(list('c', 'c'), 'a')));
       const actual = sequence(fakeParser)(parseSingleChar)(inputString);
 
-      assertEqualLists(actual, expected);
+      assert.deepEqual(actual, expected);
     });
 
   });

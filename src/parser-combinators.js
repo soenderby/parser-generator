@@ -1,7 +1,7 @@
 import { epsilon, succeed } from './elementary-parsers';
 import { apply } from './parser-tranformers';
 import { curry, chain } from 'ramda';
-import { tuple, map, head, fst, snd, list, concat } from './utils';
+import { tuple, map, head, fst, snd, list, concat, fmap } from './utils';
 
 // Execute two parsers in sequence. The second is applied to the remainder of the first
 /*
@@ -19,13 +19,22 @@ import { tuple, map, head, fst, snd, list, concat } from './utils';
 */
 const concatListReducer = (accumulator, element) => concat(accumulator, element);
 const uncurriedSequence = (firstParser, secondParser, str) =>
-  map( 
-    firstParse => 
-      [...map(
-        secondParse => tuple(secondParse.fst, tuple(firstParse.snd, secondParse.snd))
-        , secondParser(firstParse.fst)
-      )()]
-    , firstParser(str)
+  fmap(
+    t1 => {
+      const xs1 = fst(t1);
+      const v1 = snd(t1);
+
+      map(
+        t2 => {
+          const xs2 = fst(t2);
+          const v2 = snd(t2);
+
+          return tuple(xs2, tuple(v1, v2));
+        },
+        secondParser(xs1)
+      );
+    },
+    firstParser(str)
   );
 
 const sequence = curry(uncurriedSequence);

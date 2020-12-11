@@ -154,12 +154,13 @@ const map = piecewise(
 
 const fmapList = (f, list) => function* () {
   const iterator = list();
+
   while (true){
     let iteration = iterator.next();
 
     if(iteration.done)
       break;
-    else yield* f(iteration.value);
+    else yield* f(iteration.value)();
   }
 }
 

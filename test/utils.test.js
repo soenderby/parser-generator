@@ -17,7 +17,8 @@ import {
   tail,
   take,
   tuple,
-  recursiveList
+  recursiveList,
+  fmap
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -135,6 +136,22 @@ describe('Utils', () => {
       assert.deepEqual(actual, expected);
     });
   });
+
+  describe('fmap', () => {
+    it('should concat lists when given identity function', () =>{
+      const expected = list(1, 2, 3);
+      const actual = fmap(e => e, list(list(1), list(2), list(3)));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return flat list when given function that produces list', () =>{
+      const expected = list(2, 4, 6);
+      const actual = fmap(e => list(e*2), list(1, 2, 3));
+
+      assert.deepEqual(actual, expected);
+    });
+  })
 
   describe('head', () => {
     it('should return the first element of a list', () => {

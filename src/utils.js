@@ -152,6 +152,22 @@ const map = piecewise(
     otherwise, R.map
 );
 
+const fmapList = (f, list) => function* () {
+  const iterator = list();
+  while (true){
+    let iteration = iterator.next();
+
+    if(iteration.done)
+      break;
+    else yield* f(iteration.value);
+  }
+}
+
+const fmap = piecewise(
+  (f, obj) => isList(obj), fmapList,
+  otherwise, R.chain
+);
+
 const isEmptyList = (list) => {
   for(let e of list())
     return false;
@@ -270,6 +286,7 @@ export {
   isTuple,
   list,
   map,
+  fmap,
   otherwise,
   piecewise,
   snd,

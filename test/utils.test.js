@@ -43,19 +43,19 @@ describe('Utils', () => {
 
     it('should return list of natural numbers', () => {
       const expected = list(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-      const actual = recursiveList(
+      const actual = take(10, recursiveList(
           1,
           n => n + 1
-      );
+      ));
       assert.deepEqual(actual, expected);
     });
 
     it('should return list of fibonacci numbers', () => {
       const expected = list(0, 1, 1, 2, 3, 5, 8, 13, 21, 34);
-      const actual = recursiveList(
+      const actual = take(10, recursiveList(
           0, 1,
           (n1, n2) => n1 + n2
-      );
+      ));
       assert.deepEqual(actual, expected);
     });
   });

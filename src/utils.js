@@ -233,20 +233,29 @@ chai.use(function(_chai, utils) {
         const iterator1 = str.apply();
         const iterator2 = object.apply();
 
+        const list1 = [];
+        const list2 = [];
+
         // As lists can be infinite, the lists are only compared up to 100 elements
         for(let i = 0; i < 100; i++) {
           let iteration1 = iterator1.next();
           let iteration2 = iterator2.next();
 
-          if (iteration1.done || iteration2.done)
-            break;
+          if (!iteration1.done)
+            list1.push(iteration1.value);
 
-          // The list elements are compared using
-          if (negate) {
-            new chai.Assertion(iteration1.value, message).to.not.deep.equal(iteration2.value);
-          }
-          else new chai.Assertion(iteration1.value, message).to.deep.equal(iteration2.value);
+          if (!iteration2.done)
+            list2.push(iteration2.value);
+
+          if (iteration1.done && iteration2.done)
+            break;
         }
+
+        // The list elements are compared using
+        if (negate) {
+          new chai.Assertion(list1, message).to.not.deep.equal(list2);
+        }
+        else new chai.Assertion(list1, message).to.deep.equal(list2);
       }
       // If expected value is list and actual value is not, an error is thrown
       else if(isList(str) && !negate){

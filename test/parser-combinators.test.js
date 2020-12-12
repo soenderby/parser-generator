@@ -45,7 +45,7 @@ describe('Parser combinators', () => {
       const inputString = "a token";
 
       const expected = list(tuple('token', tuple('a', ' ')));
-      const actual = sequence(parseSingleChar, parseSingleChar)(inputString);
+      const actual = sequence(parseSingleChar, parseSingleChar, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -54,7 +54,7 @@ describe('Parser combinators', () => {
       const inputString = 'ab';
 
       const expected = list(tuple('', tuple('a', 'b')));
-      const actual = sequence(parseSingleChar)(parseSingleChar)(inputString);
+      const actual = sequence(parseSingleChar, parseSingleChar, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -64,7 +64,7 @@ describe('Parser combinators', () => {
       const inputString = 'a';
 
       const expected = list(tuple('', tuple('a', list('c', 'c'))));
-      const actual = sequence(parseSingleChar)(fakeParser)(inputString);
+      const actual = sequence(parseSingleChar, fakeParser, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -74,7 +74,7 @@ describe('Parser combinators', () => {
       const inputString = 'a';
 
       const expected = list(tuple('', tuple(list('c', 'c'), 'a')));
-      const actual = sequence(fakeParser)(parseSingleChar)(inputString);
+      const actual = sequence(fakeParser, parseSingleChar, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -93,7 +93,7 @@ describe('Parser combinators', () => {
         tuple( 'in', 'put')
       ];
 
-      const actual = [...alternation(parseOneItem, parseTwoItems)(inputString)];
+      const actual = [...alternation(parseOneItem, parseTwoItems, inputString)];
 
       assert.deepEqual(actual, expected);
     });
@@ -111,7 +111,7 @@ describe('Parser combinators', () => {
         tuple( '', 'input' )
       ];
 
-      const actual = [...alternation(parseOneItem)(failingParser)(inputString)];
+      const actual = [...alternation(parseOneItem, failingParser, inputString)];
 
       assert.deepEqual(actual, expected);
     });
@@ -126,7 +126,7 @@ describe('Parser combinators', () => {
         tuple( 'i', 'nput' )
       ];
 
-      const actual = [...alternation(parseOneItem)(failingParser)(inputString)];
+      const actual = [...alternation(parseOneItem, failingParser, inputString)];
 
       assert.deepEqual(actual, expected);
     });
@@ -139,7 +139,7 @@ describe('Parser combinators', () => {
       const inputString = 'ab';
 
       const expected = [tuple( 'a', '' )];
-      const actual = [...seqKeepFirst(parseOneItem)(parseOneItem)(inputString)];
+      const actual = [...seqKeepFirst(parseOneItem, parseOneItem, inputString)];
 
       assert.deepEqual(actual, expected);
     });
@@ -152,7 +152,7 @@ describe('Parser combinators', () => {
       const inputString = 'ab';
 
       const expected = tuple( 'b', '' );
-      const actual = seqKeepSecond(parseOneItem)(parseOneItem)(inputString);
+      const actual = seqKeepSecond(parseOneItem, parseOneItem, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -163,7 +163,7 @@ describe('Parser combinators', () => {
       const inputString = 'aaab';
 
       const expected = tuple( ['a', 'a', 'a'], 'b' );
-      const actual = many(parseA)(inputString);
+      const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -172,7 +172,7 @@ describe('Parser combinators', () => {
       const inputString = 'baa';
 
       const expected = tuple( [], 'baa' );
-      const actual = many(parseA)(inputString);
+      const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -181,7 +181,7 @@ describe('Parser combinators', () => {
       const inputString = 'abaa';
 
       const expected = tuple( ['a'], 'baa' );
-      const actual = many(parseA)(inputString);
+      const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -193,7 +193,7 @@ describe('Parser combinators', () => {
       const inputString = 'baa';
 
       const expected = [tuple( '', 'baa' )];
-      const actual = option(parseA)(inputString);
+      const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -202,7 +202,7 @@ describe('Parser combinators', () => {
       const inputString = 'abaa';
 
       const expected = [tuple( 'a', 'baa' )];
-      const actual = option(parseA)(inputString);
+      const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -216,7 +216,7 @@ describe('Parser combinators', () => {
       const inputString = '{block}';
       
       const expected = tuple( 'block', '');
-      const actual = block(symbol('{'))(parseToken('block'))(symbol('}'))(inputString);
+      const actual = block(symbol('{'), parseToken('block'), symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -225,7 +225,7 @@ describe('Parser combinators', () => {
       const inputString = '{block} remainder';
       
       const expected = tuple( 'block', ' remainder');
-      const actual = block(symbol('{'))(parseToken('block'))(symbol('}'))(inputString);
+      const actual = block(symbol('{'), parseToken('block'))(symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -238,7 +238,7 @@ describe('Parser combinators', () => {
       const inputString = 'post list';
 
       const expected = tuple( [''], 'post list');
-      const actual = listOf(symbol('a'))(symbol(','))(inputString);
+      const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -247,7 +247,7 @@ describe('Parser combinators', () => {
       const inputString = 'a,a,apost list';
 
       const expected = tuple( ['a', 'a', 'a'], 'post list');
-      const actual = listOf(symbol('a'))(symbol(','))(inputString);
+      const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -263,7 +263,7 @@ describe('Parser combinators', () => {
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
       const expected = tuple( '(((1+1)+1)+1)', ' rest');
-      const actual = chainLeft(symbol('1'))(separatorParser)(inputString);
+      const actual = chainLeft(symbol('1'), separatorParser, inputString);
 
       assert.deepEqual(actual, expected);
     });

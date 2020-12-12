@@ -49,11 +49,13 @@ const tuple = (...args) => {
 }
 
 /* Data types (duck typing) */
+const isArray = obj => Array.isArray(obj);
 const isFunction = obj => typeof obj === 'function';
-const isList = obj => obj.constructor.name === 'GeneratorFunction';
+const isList = obj => obj !== null && obj !== undefined && obj.constructor.name === 'GeneratorFunction';
 const isString = obj => typeof obj === 'string';
 const isTuple = obj => obj.hasOwnProperty('fst') && obj.hasOwnProperty('snd');
 
+const isAllArray = (...args) => args.every(isArray);
 const areAllList = (...args) => args.every(isList);
 const areAllFunction = (...args) => args.every(isFunction);
 const areAllString = (...args) => args.every(isString);
@@ -223,48 +225,51 @@ const take = piecewise(
 );
 
 /* Test methods */
+const listToArray = (list, maxLength = 100) => {
+  const array = [];
+  const iterator = list.apply();
+
+  for(let i = 0; i < maxLength; i++) {
+    let iteration = iterator.next();
+
+    if (iteration.done)
+      break;
+    else array.push(iteration.value);
+  }
+  return array;
+}
+
+const listToArrayRecursively = (obj, maxLength, depth = 0) => {
+  const func = e => listToArrayRecursively(e, maxLength, depth + 1);
+
+  if (depth > 10)
+    return obj;
+
+  if (isList(obj))
+    return listToArray(obj).map(func);
+  if (isArray(obj))
+    return obj.map(func);
+  else if (typeof obj === 'object'){
+    let output = {};
+    for(let key of Object.keys(obj))
+      output[key] = func(obj[key]);
+    return output;
+  }
+  else return obj;
+}
+
 chai.use(function(_chai, utils) {
   // Overwrites the eql method, which is called recursively by assert.deepEqual, to support list comparisons
   utils.overwriteMethod(_chai.Assertion.prototype, 'eql', function(_super) {
-    return function(str) {
-      const { object, negate, message } = this.__flags;
-
-      // List elements are only compared when both actual value and expected values are lists
-      if (isList(str) && isList(object)) {
-        const iterator1 = str.apply();
-        const iterator2 = object.apply();
-
-        const list1 = [];
-        const list2 = [];
-
-        // As lists can be infinite, the lists are only compared up to 100 elements
-        for(let i = 0; i < 100; i++) {
-          let iteration1 = iterator1.next();
-          let iteration2 = iterator2.next();
-
-          if (!iteration1.done)
-            list1.push(iteration1.value);
-
-          if (!iteration2.done)
-            list2.push(iteration2.value);
-
-          if (iteration1.done && iteration2.done)
-            break;
-        }
-
-        // The list elements are compared using
-        if (negate) {
-          new chai.Assertion(list1, message).to.not.deep.equal(list2);
-        }
-        else new chai.Assertion(list1, message).to.deep.equal(list2);
+    return function(str, i = 0) {
+      if (i === 0){
+        str = listToArrayRecursively(str);
+        this.__flags.object = listToArrayRecursively(this.__flags.object);
       }
-      // If expected value is list and actual value is not, an error is thrown
-      else if(isList(str) && !negate){
-        chai.assert.fail("#{this} to be a list");
-      }
-      else _super.apply(this, arguments);
+      //chai.assert.deepEqual(str, this.__flags.obj);
+      _super.apply(this, [str, i + 1]);
     }
-  })
+  });
 });
 
 /* Tuple methods */
@@ -295,6 +300,8 @@ export {
   isNonEmpty,
   isTuple,
   list,
+  listToArray,
+  listToArrayRecursively,
   map,
   fmap,
   otherwise,

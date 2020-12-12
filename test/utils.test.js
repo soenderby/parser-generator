@@ -18,7 +18,7 @@ import {
   take,
   tuple,
   recursiveList,
-  fmap
+  fmap, listToArray, listToArrayRecursively
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -264,6 +264,104 @@ describe('Utils', () => {
       const actual = take(2, 'a');
 
       assert.deepEqual(actual, expect);
+    });
+  });
+
+  /* Test functions */
+  describe('listToArray', () => {
+    it ('should convert list to array', () => {
+      const expected = [1, 2, 3];
+      const actual = listToArray(list(1, 2, 3));
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('listToArrayRecursively', () => {
+    it('should convert list of primitives to array of primitives', () => {
+      const expected = [1, 2, 3];
+      const actual = listToArrayRecursively(list(1, 2, 3));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should convert list of objects to array of objects', () => {
+      const expected = [{a: 1}, {a: 2}, {a: 3}];
+      const actual = listToArrayRecursively(list({a: 1}, {a: 2}, {a: 3}));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should convert list of lists to array of arrays', () => {
+      const expected = [[1], [2], [3]];
+      const actual = listToArrayRecursively(list(list(1), list(2), list(3)));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should convert list properties to array properties', () => {
+      const expected = { a: [1, 2, 3] };
+      const actual = listToArrayRecursively({a: list(1, 2, 3) });
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('chai deepEqual plugin', () => {
+    it ('should equate empty lists', () => {
+      const data1 = list();
+      const data2 = list();
+
+      assert.deepEqual(data1, data2);
+    });
+
+    it ('should not equate empty list and non-empty list', () => {
+      const data1 = list();
+      const data2 = list(1);
+
+      assert.throws(() => assert.deepEqual(data1, data2));
+    });
+
+    it ('should equate equal lists of primitives', () => {
+      const data1 = list(1, 2, 3);
+      const data2 = list(1, 2, 3);
+
+      assert.deepEqual(data1, data2);
+    });
+
+    it ('should not equate non-equal list of primitives', () => {
+      const data1 = list(1, 2, 3);
+      const data2 = list(1, 2, 2);
+
+      assert.throws(() => assert.deepEqual(data1, data2));
+    });
+
+    it ('should equate equal lists of objects', () => {
+      const data1 = list({a: 1}, {a: 2}, {a: 3});
+      const data2 = list({a: 1}, {a: 2}, {a: 3});
+
+      assert.deepEqual(data1, data2);
+    });
+
+    it ('should not equate non-equal lists of objects', () => {
+      const data1 = list({a: 1}, {a: 2}, {a: 3});
+      const data2 = list({a: 1}, {a: 2}, {a: 2});
+
+      assert.throws(() => assert.deepEqual(data1, data2));
+    });
+
+    it ('should equate equal list of lists', () => {
+      const data1 = list(list(1, 2, 3), list(1, 2, 3));
+      const data2 = list(list(1, 2, 3), list(1, 2, 3));
+
+      assert.deepEqual(data1, data2);
+    });
+
+    it ('should not equate non-equal list of lists', () => {
+      const data1 = list(list(1, 2, 3), list(1, 2, 3));
+      const data2 = list(list(1, 2, 2), list(1, 2, 3));
+
+      assert.throws(() => assert.deepEqual(data1, data2));
     });
   });
 

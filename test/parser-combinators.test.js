@@ -16,26 +16,10 @@ import {
   curry
 } from '../src/utils';
 
-const assertEqualLists = (list1, list2) => {
-  assert.deepEqual([...list1()],[...list2()]);
-}
-
-const parseA = string => string.charAt(0) === 'a' ?
-  list(tuple(
-       tail(string),
-       'a'
-    ))
-  :
-  emptyList();
-
-/*const symbol = symbol => string => string.charAt(0) === symbol ?
-  list(tuple(
-       tail(string),
-       symbol
-    ))
-  :
-  emptyList();
-  */
+const parseA = str => piecewise(
+    s => head(s) === 'a', s => list(tuple('a', tail(s))),
+    otherwise, emptyList
+)(str);
 
 const parseSingleChar = str => list(tuple(tail(str), head(str)));
 
@@ -60,7 +44,7 @@ describe('Parser combinators', () => {
     });
 
     it('should work when the second parser returns multiple results', () => {
-      const fakeParser = string => list(tuple('', list('c', 'c')));
+      const fakeParser = str => list(tuple('', list('c', 'c')));
       const inputString = 'a';
 
       const expected = list(tuple('', tuple('a', list('c', 'c'))));
@@ -70,7 +54,7 @@ describe('Parser combinators', () => {
     });
 
     it('should work when the first parser returns multiple results', () => {
-      const fakeParser = string => list(tuple('a', list('c', 'c')));
+      const fakeParser = str => list(tuple('a', list('c', 'c')));
       const inputString = 'a';
 
       const expected = list(tuple('', tuple(list('c', 'c'), 'a')));
@@ -83,17 +67,16 @@ describe('Parser combinators', () => {
 
   describe('alternation', () => {
     it('should return all possible successes of choice between two parsers', () => {
-      const parseOneItem = parser(string => tuple( string.slice(0, 1), string.slice(1) ));
-      const parseTwoItems = parser(string => tuple( string.slice(0, 2), string.slice(2) ));
+      const parseOneItem = str => list(tuple(tail(str), head(str)));
+      const parseTwoItems = str => list(tuple(drop(2, str), take(2, str)));
 
       const inputString = 'input';
 
-      const expected = [
-        tuple( 'i', 'nput'),
-        tuple( 'in', 'put')
-      ];
-
-      const actual = [...alternation(parseOneItem, parseTwoItems, inputString)];
+      const expected = list(
+        tuple('nput', 'i'),
+        tuple('put', 'in')
+      );
+      const actual = alternation(parseOneItem, parseTwoItems, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -101,32 +84,30 @@ describe('Parser combinators', () => {
     // This is a test that should be run if the implementation of failing is changed
     
     it('given parsers where only one succeeds, should both results', () => {
-      const parseOneItem = parser(string => tuple( string.slice(0, 1), string.slice(1) ));
-      const failingParser = parser(string => tuple( '',  string ));
+      const parseOneItem = str => list(tuple(tail(str), head(str)));
+      const failingParser = str => list(tuple(str, '' ));
 
       const inputString = 'input';
 
-      const expected = [ 
-        tuple( 'i', 'nput'),
-        tuple( '', 'input' )
-      ];
-
-      const actual = [...alternation(parseOneItem, failingParser, inputString)];
+      const expected = list(
+        tuple('nput', 'i'),
+        tuple('input', '')
+      );
+      const actual = alternation(parseOneItem, failingParser, inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should not add undefined elements to the result', () => {
-      const parseOneItem = parser(string => tuple( string.slice(0, 1), string.slice(1) ));
+      const parseOneItem = str => list(tuple(head(str), tail(str)));
       const failingParser = fail;
 
       const inputString = 'input';
 
-      const expected = [ 
-        tuple( 'i', 'nput' )
-      ];
-
-      const actual = [...alternation(parseOneItem, failingParser, inputString)];
+      const expected = list(
+        tuple('i', 'nput')
+      );
+      const actual = alternation(parseOneItem, failingParser, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -134,12 +115,10 @@ describe('Parser combinators', () => {
 
   describe('seqKeepFirst', () => {
     it('should apply two parsers in sequence, but return only the result of the first', () => {
-      const parseOneItem = parser(string => tuple( string.slice(0, 1), string.slice(1) ));
+      const parseOneItem = str => list(tuple(tail(str), head(str)));
 
-      const inputString = 'ab';
-
-      const expected = [tuple( 'a', '' )];
-      const actual = [...seqKeepFirst(parseOneItem, parseOneItem, inputString)];
+      const expected = list(tuple('', 'a'));
+      const actual = seqKeepFirst(parseOneItem, parseOneItem, 'ab');
 
       assert.deepEqual(actual, expected);
     });
@@ -147,12 +126,10 @@ describe('Parser combinators', () => {
 
   describe('seqKeepSecond', () => {
     it('should apply two parsers in sequence, but return only the result of the second', () => {
-      const parseOneItem = string => tuple( string.slice(0, 1), string.slice(1) );
+      const parseOneItem = str => list(tuple(tail(str), head(str)));
 
-      const inputString = 'ab';
-
-      const expected = tuple( 'b', '' );
-      const actual = seqKeepSecond(parseOneItem, parseOneItem, inputString);
+      const expected = list(tuple('', 'b'));
+      const actual = seqKeepSecond(parseOneItem, parseOneItem, 'ab');
 
       assert.deepEqual(actual, expected);
     });
@@ -162,7 +139,7 @@ describe('Parser combinators', () => {
     it('should apply a given parser multiple times if successful', () => {
       const inputString = 'aaab';
 
-      const expected = tuple( ['a', 'a', 'a'], 'b' );
+      const expected = list(tuple(list('a', 'a', 'a'), 'b' ));
       const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -171,7 +148,7 @@ describe('Parser combinators', () => {
     it('should not apply a given parser if it fails the first time', () => {
       const inputString = 'baa';
 
-      const expected = tuple( [], 'baa' );
+      const expected = list(tuple(list(), 'baa' ));
       const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -180,7 +157,7 @@ describe('Parser combinators', () => {
     it('should apply a given parser multiple times until it fails', () => {
       const inputString = 'abaa';
 
-      const expected = tuple( ['a'], 'baa' );
+      const expected = list(tuple(list('a'), 'baa' ));
       const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -192,7 +169,7 @@ describe('Parser combinators', () => {
     it('should return an empty result if parser was not recognised', () => {
       const inputString = 'baa';
 
-      const expected = [tuple( '', 'baa' )];
+      const expected = list(tuple( '', 'baa' ));
       const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -201,7 +178,7 @@ describe('Parser combinators', () => {
     it('should return a list with a single resulting element if parser was recognised', () => {
       const inputString = 'abaa';
 
-      const expected = [tuple( 'a', 'baa' )];
+      const expected = list(tuple( 'a', 'baa' ));
       const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -210,12 +187,12 @@ describe('Parser combinators', () => {
   });
 
   describe('block', () => {
-    const parseToken = token => string => tuple( string.slice(0, token.length),  string.slice(token.length));
+    const parseToken = token => str => list(tuple(take(token.length, str),  drop(token.length, str)));
 
     it('should parse a section that is between a start and end delimiter', () => {
       const inputString = '{block}';
       
-      const expected = tuple( 'block', '');
+      const expected = list(tuple( 'block', ''));
       const actual = block(symbol('{'), parseToken('block'), symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
@@ -224,7 +201,7 @@ describe('Parser combinators', () => {
     it('should parse a section that is between a start and end delimiter, and return remainder', () => {
       const inputString = '{block} remainder';
       
-      const expected = tuple( 'block', ' remainder');
+      const expected = list(tuple( 'block', ' remainder'));
       const actual = block(symbol('{'), parseToken('block'))(symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
@@ -237,7 +214,7 @@ describe('Parser combinators', () => {
     it('should parse an empty list', () => {
       const inputString = 'post list';
 
-      const expected = tuple( [''], 'post list');
+      const expected = list(tuple( [''], 'post list'));
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
@@ -246,7 +223,7 @@ describe('Parser combinators', () => {
     it('should parse a non-empty list given parser for the items', () => {
       const inputString = 'a,a,apost list';
 
-      const expected = tuple( ['a', 'a', 'a'], 'post list');
+      const expected = list(tuple( ['a', 'a', 'a'], 'post list'));
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
@@ -258,11 +235,11 @@ describe('Parser combinators', () => {
       const inputString = '1+1+1 rest';
 
       const separatorParser = string => {
-        return tuple( (elementOne => elementTwo => '(' + elementOne + '+' + elementTwo + ')'), string.slice(1) );
+        return list(tuple( (elementOne => elementTwo => '(' + elementOne + '+' + elementTwo + ')'), string.slice(1) ));
       } 
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
-      const expected = tuple( '(((1+1)+1)+1)', ' rest');
+      const expected = list(tuple( '(((1+1)+1)+1)', ' rest'));
       const actual = chainLeft(symbol('1'), separatorParser, inputString);
 
       assert.deepEqual(actual, expected);

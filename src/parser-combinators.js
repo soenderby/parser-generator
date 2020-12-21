@@ -68,14 +68,14 @@ const many = curry(uncurriedMany);
 
 const uncurriedOption = (p, str) => {
   return alternation(
-      apply(p, x => list(x)),
-      apply(epsilon, x => list()),
+      apply(x => list(x), p),
+      apply(x => list(), epsilon),
       str
   );
 }
 const option = curry(uncurriedOption);
 
-// Note after running the test: Holy shit, I can't believe that worked!
+
 const uncurriedBlock = (startDelimiter, contentParser, endDelimiter, string) => {
   return seqKeepFirst(
       seqKeepSecond(startDelimiter, contentParser),

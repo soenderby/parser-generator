@@ -17,7 +17,7 @@ import {
 } from '../src/utils';
 
 const parseA = str => piecewise(
-    s => head(s) === 'a', s => list(tuple('a', tail(s))),
+    s => head(s) === 'a', s => list(tuple(tail(s), 'a')),
     otherwise, emptyList
 )(str);
 
@@ -169,7 +169,7 @@ describe('Parser combinators', () => {
     it('should return an empty result if parser was not recognised', () => {
       const inputString = 'baa';
 
-      const expected = list(tuple( '', 'baa' ));
+      const expected = list(tuple( 'baa', list() ));
       const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -178,7 +178,7 @@ describe('Parser combinators', () => {
     it('should return a list with a single resulting element if parser was recognised', () => {
       const inputString = 'abaa';
 
-      const expected = list(tuple( 'a', 'baa' ));
+      const expected = list(tuple( 'baa', list('a') ));
       const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -187,12 +187,12 @@ describe('Parser combinators', () => {
   });
 
   describe('block', () => {
-    const parseToken = token => str => list(tuple(take(token.length, str),  drop(token.length, str)));
+    const parseToken = token => str => list(tuple(drop(token.length, str), take(token.length, str)));
 
     it('should parse a section that is between a start and end delimiter', () => {
       const inputString = '{block}';
       
-      const expected = list(tuple( 'block', ''));
+      const expected = list(tuple( '', 'block' ));
       const actual = block(symbol('{'), parseToken('block'), symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
@@ -201,20 +201,18 @@ describe('Parser combinators', () => {
     it('should parse a section that is between a start and end delimiter, and return remainder', () => {
       const inputString = '{block} remainder';
       
-      const expected = list(tuple( 'block', ' remainder'));
+      const expected = list(tuple( ' remainder', 'block' ));
       const actual = block(symbol('{'), parseToken('block'))(symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
     });
-
-    // There should be a test that it fails correctly. Once I implement failing that is.
   });
 
   describe('listOf', () => {
     it('should parse an empty list', () => {
       const inputString = 'post list';
 
-      const expected = list(tuple( [''], 'post list'));
+      const expected = list(tuple('post list', list()));
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
@@ -223,7 +221,7 @@ describe('Parser combinators', () => {
     it('should parse a non-empty list given parser for the items', () => {
       const inputString = 'a,a,apost list';
 
-      const expected = list(tuple( ['a', 'a', 'a'], 'post list'));
+      const expected = list(tuple('post list', list('a', 'a', 'a')));
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
@@ -235,11 +233,11 @@ describe('Parser combinators', () => {
       const inputString = '1+1+1 rest';
 
       const separatorParser = string => {
-        return list(tuple( (elementOne => elementTwo => '(' + elementOne + '+' + elementTwo + ')'), string.slice(1) ));
+        return list(tuple(string.slice(1), (elementOne => elementTwo => '(' + elementOne + '+' + elementTwo + ')')));
       } 
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
-      const expected = list(tuple( '(((1+1)+1)+1)', ' rest'));
+      const expected = list(tuple(' rest', '(((1+1)+1)+1)'));
       const actual = chainLeft(symbol('1'), separatorParser, inputString);
 
       assert.deepEqual(actual, expected);

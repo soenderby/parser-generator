@@ -1,25 +1,25 @@
 import { assert } from 'chai';
 import { removeLeadingWhitespace, just, apply, some } from '../src/parser-tranformers';
-import { tuple } from '../src/utils';
+import { tuple, list } from '../src/utils';
 
 describe('Parser transformers', () => {
   describe('removeLeadingWhitespace', () => {
     it('should make a parser ignore leading whitespace', () => {
-      const parseOneItem = string => tuple( string.slice(0, 1), string.slice(1) );
+      const parseOneItem = string => list(tuple(string.slice(1), string.slice(0, 1)));
       const inputString = '   \n a';
 
-      const expected = tuple( 'a', '' );
-      const actual = removeLeadingWhitespace(parseOneItem)(inputString);
+      const expected = list(tuple( '', 'a' ));
+      const actual = removeLeadingWhitespace(parseOneItem, inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should leave trailing whitespace', () => {
-      const parseOneItem = string => tuple( string.slice(0, 1), string.slice(1) );
+      const parseOneItem = string => list(tuple( string.slice(1), string.slice(0, 1) ));
       const inputString = '   \n ab   ';
 
-      const expected = tuple( 'a', 'b   ' );
-      const actual = removeLeadingWhitespace(parseOneItem)(inputString);
+      const expected = list(tuple( 'b   ', 'a' ));
+      const actual = removeLeadingWhitespace(parseOneItem, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -29,15 +29,15 @@ describe('Parser transformers', () => {
     it('should only return results of given parser with empty remainder', () => {
       // fake parser, ignores parameter
       const parser = string => [ 
-        tuple( 'result1', 'not empty' ),
-        tuple( 'result2', '' ),
-        tuple( 'result3', 'also not empty' )
+        tuple( 'b   ', 'a' ),
+        tuple( '', 'result2' ),
+        tuple( 'also not empty', 'result3' )
       ];
 
       const expected = [ 
-        tuple( 'result2', '' )
+        tuple( '', 'result2' )
       ];
-      const actual = just(parser)('string');
+      const actual = just(parser, 'string');
 
       assert.deepEqual(actual, expected);
     });
@@ -58,11 +58,11 @@ describe('Parser transformers', () => {
     */
 
    it('should apply given function to the result', () => {
-    const parser = string => tuple( 'result', '' );
-    const givenFunction = result => tuple( result.fst.toUpperCase(), result.snd);
+    const parser = string => list(tuple( '', 'result' ));
+    const givenFunction = parseTree => parseTree.toUpperCase();
 
-    const expected = tuple( 'RESULT', '' );
-    const actual = apply(givenFunction)(parser)('string');
+    const expected = list(tuple( '', 'RESULT' ));
+    const actual = apply(givenFunction, parser, 'string');
 
     assert.deepEqual(actual, expected);
   });
@@ -70,10 +70,10 @@ describe('Parser transformers', () => {
 
   describe('some', () => {
     it('should return parser that only returns result, and no remainder', () => {
-      const parser = string => tuple( 'result', '' );
+      const parser = string => list(tuple('' , 'result'));
 
-      const expected = 'result';
-      const actual = some(parser)('string');
+      const expected = list('result');
+      const actual = some(parser, 'string');
 
       assert.deepEqual(actual, expected);
     });

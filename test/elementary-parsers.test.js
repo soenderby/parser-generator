@@ -18,7 +18,7 @@ describe('Elementary parsers', () => {
       const charParameter = 'a';
       const inputString = "input text with a";
 
-      const expected = emptyList();
+      const expected = '';
       const actual = symbol(charParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -28,7 +28,7 @@ describe('Elementary parsers', () => {
       const charParameter = 'a';
       const inputString = "input text";
 
-      const expected = emptyList();
+      const expected = '';
       const actual = symbol(charParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -50,7 +50,7 @@ describe('Elementary parsers', () => {
       const tokenParameter = 'token';
       const inputString = "nothing then token and the rest";
 
-      const expected = list();
+      const expected = '';
       const actual = token(tokenParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -72,7 +72,7 @@ describe('Elementary parsers', () => {
       const predicate = x => x === 'a';
       const inputString = 'b';
 
-      const expected = list();
+      const expected = '';
       const actual = satisfy(predicate, inputString);
 
       assert.deepEqual(actual, expected);

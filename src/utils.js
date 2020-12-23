@@ -2,35 +2,46 @@ import * as R from 'ramda';
 import * as chai from 'chai';
 
 /* Data structures */
+//TODO type-check to see if all args are of the same type
 const list = (...args) => {
-  return function* (){
-    for(let i = 0; i < args.length; i++){
+  if (args.length > 0 && args.every(isString))
+    return args.join();
+
+  return function* () {
+    for (let i = 0; i < args.length; i++) {
       yield args[i];
     }
   }
 }
-const emptyList = () => list();
+// a single arg indicates whether to make an empty string or an empty list
+const emptyList = (...args) => {
+  if (args.length === 0)
+    return list();
+  else if (args.length === 1)
+    return isString(args[0]) ? '' : list();
+  else Error('emptyList expects at most 2 arguments');
+}
 
 const recursiveList = (...args) => {
   if (args.length < 2)
-    throw 'recursiveList expects at least 2 arguments';
+    throw Error('recursiveList expects at least 2 arguments');
 
   if (!isFunction(args[args.length - 1]))
-    throw 'recursiveList expects last argument to be function';
+    throw Error('recursiveList expects last argument to be function');
 
   return function* () {
     let baseCases = [];
     const recursiveCase = args[args.length - 1];
 
     // Returns a finite sequence of all base cases
-    for (let i = 0; i < args.length - 1; i++){
+    for (let i = 0; i < args.length - 1; i++) {
       const value = args[i];
       baseCases[i] = value;
       yield value;
     }
 
     // Returns an infinite sequence of subsequent recursive cases
-    while(true) {
+    while (true) {
       const value = recursiveCase.apply(this, baseCases);
       baseCases = [...baseCases.slice(1), value];
       yield value;
@@ -40,7 +51,7 @@ const recursiveList = (...args) => {
 
 const tuple = (...args) => {
   if (args.length >= 3)
-    throw 'tuple only supports up to 2 arguments'
+    throw Error('tuple only supports up to 2 arguments')
 
   return {
     fst: args.length >= 1 ? args[0] : undefined,
@@ -64,67 +75,74 @@ const areAllString = (...args) => args.every(isString);
 // based on https://www.maplesoft.com/support/help/Maple/view.aspx?path=examples%2Fpiecewise
 const piecewise = (...outerArgs) => {
   if (outerArgs.length < 2)
-    throw  "piecewise expects at least 2 arguments"
+    throw  Error("piecewise expects at least 2 arguments")
 
   if (outerArgs.length % 2 !== 0)
-    throw "piecewise expects even number of arguments";
+    throw Error("piecewise expects even number of arguments");
 
-  for(let i = 0; i < outerArgs.length; i++){
+  for (let i = 0; i < outerArgs.length; i++) {
     if (!isFunction(outerArgs[i]))
-      throw `piecewise argument ${i} is not a function`
+      throw Error(`piecewise argument ${i} is not a function`);
   }
 
   return (...innerArgs) => {
-    for(let i = 0; i < outerArgs.length; i += 2){
-      if(outerArgs[i].apply(this, innerArgs))
+    for (let i = 0; i < outerArgs.length; i += 2) {
+      if (outerArgs[i].apply(this, innerArgs))
         return outerArgs[i + 1].apply(this, innerArgs);
     }
-    throw 'arguments do not fulfill any predicate';
+    throw Error('arguments do not fulfill any predicate');
   };
 };
 const otherwise = () => true;
 
-const notSupportedError = obj => { throw `Does not support ${obj}` };
+const notSupportedError = obj => {
+  throw Error(`Does not support ${obj}`);
+};
 
 const curry = R.curry;
 
 /* List functions */
-const concatList = (list1, list2) => function* () {
-  const iterator1 = list1();
-  const iterator2 = list2();
-
-  while(true){
-    let iteration = iterator1.next();
-
-    if (iteration.done)
-      break;
-    else yield iteration.value;
+const concat = (list1, list2) => {
+  if (!areAllList(list1, list2)) {
+    if (isList(list1) || isList(list2)) {
+      throw Error('concat can not concatenate list and non-list');
+    }
+    return R.concat(list1, list2);
   }
 
-  while(true){
-    let iteration = iterator2.next();
+  return function* () {
+    const iterator1 = list1();
+    const iterator2 = list2();
 
-    if (iteration.done)
-      break;
-    else yield iteration.value;
+    while (true) {
+      let iteration = iterator1.next();
+
+      if (iteration.done)
+        break;
+      else yield iteration.value;
+    }
+
+    while (true) {
+      let iteration = iterator2.next();
+
+      if (iteration.done)
+        break;
+      else yield iteration.value;
+    }
   }
 }
-const concat = piecewise(
-  areAllList, concatList,
-  otherwise, R.concat
-);
 
-const dropList = (n, list) => function*() {
+const dropList = (n, list) => function* () {
   let iterator = list();
 
-  for(let i = 0; i < n; i++){
-    if(iterator.next().done)
+  for (let i = 0; i < n; i++) {
+    if (iterator.next().done)
       break;
   }
 
-  while(true){
+  while (true) {
     let iteration = iterator.next();
-    if(iteration.done)
+    if (iteration.done)
       break;
     else yield iteration.value;
   }
@@ -133,34 +151,34 @@ const dropString = (n, str) => {
   return str.slice(n, str.length);
 }
 const drop = piecewise(
-    (n, obj) => isList(obj), dropList,
-    (n, obj) => isString(obj), dropString,
-    otherwise, notSupportedError
+  (n, obj) => isList(obj), dropList,
+  (n, obj) => isString(obj), dropString,
+  otherwise, notSupportedError
 );
 
 const mapList = (f, list) => function* () {
   const iterator = list();
 
-  while (true){
+  while (true) {
     let iteration = iterator.next();
 
-    if(iteration.done)
+    if (iteration.done)
       break;
     else yield f(iteration.value);
   }
 }
 const map = piecewise(
-    (f, obj) => isList(obj), mapList,
-    otherwise, R.map
+  (f, obj) => isList(obj), mapList,
+  otherwise, R.map
 );
 
 const fmapList = (f, list) => function* () {
   const iterator = list();
 
-  while (true){
+  while (true) {
     let iteration = iterator.next();
 
-    if(iteration.done)
+    if (iteration.done)
       break;
     else yield* f(iteration.value)();
   }
@@ -172,16 +190,16 @@ const fmap = piecewise(
 );
 
 const filterList = (f, list) => function* () {
- const iterator = list();
+  const iterator = list();
 
- while (true){
-   let iteration = iterator.next();
+  while (true) {
+    let iteration = iterator.next();
 
-   if(iteration.done)
-     break;
-   else if(f(iteration.value))
-    yield iteration.value;
- }
+    if (iteration.done)
+      break;
+    else if (f(iteration.value))
+      yield iteration.value;
+  }
 }
 
 const filter = piecewise(
@@ -190,7 +208,7 @@ const filter = piecewise(
 )
 
 const isEmptyList = (list) => {
-  for(let e of list())
+  for (let e of list())
     return false;
   return true;
 };
@@ -209,14 +227,14 @@ const head = piecewise(
   otherwise, R.head
 );
 
-const tailList = (list) => function* (){
+const tailList = (list) => function* () {
   let iterator = list();
   iterator.next();
 
-  while(true) {
+  while (true) {
     let iteration = iterator.next();
 
-    if(iteration.done)
+    if (iteration.done)
       break;
     else yield iteration.value;
   }
@@ -226,20 +244,20 @@ const tail = piecewise(
   otherwise, R.tail
 );
 
-const takeList = (n, list) => function*() {
+const takeList = (n, list) => function* () {
   let iterator = list();
 
-  for(let i = 0; i < n; i++) {
+  for (let i = 0; i < n; i++) {
     let iteration = iterator.next();
 
-    if(iteration.done)
+    if (iteration.done)
       break;
     else yield iteration.value;
   }
 }
 const take = piecewise(
-    (n, obj) => isList(obj), takeList,
-    otherwise, R.take
+  (n, obj) => isList(obj), takeList,
+  otherwise, R.take
 );
 
 /* Test methods */
@@ -247,7 +265,7 @@ const listToArray = (list, maxLength = 100) => {
   const array = [];
   const iterator = list.apply();
 
-  for(let i = 0; i < maxLength; i++) {
+  for (let i = 0; i < maxLength; i++) {
     let iteration = iterator.next();
 
     if (iteration.done)
@@ -267,20 +285,19 @@ const listToArrayRecursively = (obj, maxLength, depth = 0) => {
     return listToArray(obj).map(func);
   if (isArray(obj))
     return obj.map(func);
-  else if (typeof obj === 'object'){
+  else if (typeof obj === 'object') {
     let output = {};
-    for(let key of Object.keys(obj))
+    for (let key of Object.keys(obj))
       output[key] = func(obj[key]);
     return output;
-  }
-  else return obj;
+  } else return obj;
 }
 
-chai.use(function(_chai, utils) {
+chai.use(function (_chai, utils) {
   // Overwrites the eql method, which is called recursively by assert.deepEqual, to support list comparisons
-  utils.overwriteMethod(_chai.Assertion.prototype, 'eql', function(_super) {
-    return function(str, i = 0) {
-      if (i === 0){
+  utils.overwriteMethod(_chai.Assertion.prototype, 'eql', function (_super) {
+    return function (str, i = 0) {
+      if (i === 0) {
         str = listToArrayRecursively(str);
         this.__flags.object = listToArrayRecursively(this.__flags.object);
       }
@@ -303,8 +320,8 @@ const sndTuple = t => {
   return t.snd;
 }
 const snd = piecewise(
-    isTuple, sndTuple,
-    otherwise, notSupportedError
+  isTuple, sndTuple,
+  otherwise, notSupportedError
 );
 
 export {
@@ -330,5 +347,6 @@ export {
   take,
   tuple,
   curry,
-  recursiveList
+  recursiveList,
+  isString
 }

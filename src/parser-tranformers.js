@@ -27,7 +27,6 @@ const just = curry(uncurriedJust);
 const uncurriedApply = (func, parser, string) => {
   return map(res => tuple(res.fst, func(res.snd)), parser(string) );
 }
-
 const apply = curry(uncurriedApply);
 
 // It is possible that this should be able to handle lists of results.

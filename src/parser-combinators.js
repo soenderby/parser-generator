@@ -1,7 +1,22 @@
 import { epsilon, succeed } from './elementary-parsers';
 import { apply } from './parser-tranformers';
 import { curry, chain } from 'ramda';
-import {tuple, map, head, fst, snd, list, concat, fmap, recursiveList} from './utils';
+import {
+    tuple,
+    map,
+    head,
+    fst,
+    snd,
+    list,
+    concat,
+    fmap,
+    recursiveList,
+    piecewise,
+    isEmpty,
+    otherwise,
+    emptyList, isList,
+    isString
+} from './utils';
 
 // Execute two parsers in sequence. The second is applied to the remainder of the first
 /*
@@ -59,9 +74,10 @@ const uncurriedSeqKeepSecond = (p1, p2, str) => {
 const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 
 const uncurriedMany = (p, str) => {
-  return recursiveList(
-    p(str),
-    previousP => sequence(p, previousP, str)
+  return alternation(
+      sequence(p, many(p)),
+      succeed(emptyList(str)),
+      str
   );
 };
 const many = curry(uncurriedMany);
@@ -69,7 +85,7 @@ const many = curry(uncurriedMany);
 const uncurriedOption = (p, str) => {
   return alternation(
       apply(x => list(x), p),
-      apply(x => list(), epsilon),
+      apply(x => emptyList(x), epsilon),
       str
   );
 }
@@ -86,7 +102,7 @@ const uncurriedBlock = (startDelimiter, contentParser, endDelimiter, string) => 
 const block = curry(uncurriedBlock);
 
 const uncurriedListOf = (itemParser, separatorParser, string) => {
-  return sequence(itemParser)(many(seqKeepSecond(separatorParser)(itemParser)))(string);
+  return sequence(itemParser, many(seqKeepSecond(separatorParser, itemParser)), string);
 }
 
 const listOf = curry(uncurriedListOf);

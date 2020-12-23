@@ -1,5 +1,5 @@
 import { curry, compose } from 'ramda';
-import { tuple, map, snd, head } from './utils';
+import { tuple, map, snd, head, filter, isEmpty } from './utils';
 
 const uncurriedRemoveLeadingWhitespace = (parser, string) => parser(string.trimStart(string));
 
@@ -8,11 +8,8 @@ const removeLeadingWhitespace = curry(uncurriedRemoveLeadingWhitespace);
 // Only returns results with empty remainder
 // This could be improved with a filter function for lists
 const uncurriedJust = (parser, string) => 
-  map(
-    res => {
-      if(res.fst === '')
-        return res
-    },
+  filter(
+    elem => isEmpty(elem.fst),
     parser(string)
   );
 
@@ -35,13 +32,15 @@ const apply = curry(uncurriedApply);
 
 // It is possible that this should be able to handle lists of results.
 // It should also fail if there are no results with an empty remainder
-const some = parser => string => {
+const uncurriedSome = (parser, string) => {
   return compose(
     snd,
     head,
     just
-  )(parser(string))
+  )(parser, string)
 }
+
+const some = curry(uncurriedSome);
 
 export {
   removeLeadingWhitespace,

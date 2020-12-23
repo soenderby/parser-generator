@@ -171,6 +171,24 @@ const fmap = piecewise(
   otherwise, R.chain
 );
 
+const filterList = (f, list) => function* () {
+ const iterator = list();
+
+ while (true){
+   let iteration = iterator.next();
+
+   if(iteration.done)
+     break;
+   else if(f(iteration.value))
+    yield iteration.value;
+ }
+}
+
+const filter = piecewise(
+  (f, obj) => isList(obj), filterList,
+  otherwise, R.filter
+)
+
 const isEmptyList = (list) => {
   for(let e of list())
     return false;
@@ -304,6 +322,7 @@ export {
   listToArrayRecursively,
   map,
   fmap,
+  filter,
   otherwise,
   piecewise,
   snd,

@@ -3,6 +3,7 @@ import {
   concat,
   drop,
   emptyList,
+  filter,
   fst,
   head,
   isEmpty,
@@ -137,6 +138,22 @@ describe('Utils', () => {
     });
   });
 
+  describe('filter', () => {
+    it('should return same list given true predicate', () => {
+      const expected = list(1, 2, 3);
+      const actual = filter(e => true, list(1, 2, 3));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return a list containing only elements that match predicate', () => {
+      const expected = list(2, 4);
+      const actual = filter(e => e % 2 === 0, list(1, 2, 3, 4, 5));
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
   describe('fmap', () => {
     it('should concat lists when given identity function', () =>{
       const expected = list(1, 2, 3);
@@ -151,7 +168,7 @@ describe('Utils', () => {
 
       assert.deepEqual(actual, expected);
     });
-  })
+  });
 
   describe('head', () => {
     it('should return the first element of a list', () => {

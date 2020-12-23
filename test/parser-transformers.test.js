@@ -28,15 +28,13 @@ describe('Parser transformers', () => {
   describe('just', () => {
     it('should only return results of given parser with empty remainder', () => {
       // fake parser, ignores parameter
-      const parser = string => [ 
+      const parser = string => list( 
         tuple( 'b   ', 'a' ),
         tuple( '', 'result2' ),
         tuple( 'also not empty', 'result3' )
-      ];
+      );
 
-      const expected = [ 
-        tuple( '', 'result2' )
-      ];
+      const expected = list(tuple( '', 'result2' ));
       const actual = just(parser, 'string');
 
       assert.deepEqual(actual, expected);
@@ -72,7 +70,20 @@ describe('Parser transformers', () => {
     it('should return parser that only returns result, and no remainder', () => {
       const parser = string => list(tuple('' , 'result'));
 
-      const expected = list('result');
+      const expected = 'result';
+      const actual = some(parser, 'string');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return parser that only returns first result with no remainder', () => {
+      const parser = string => list(
+          tuple('remainder', 'result1'),
+          tuple('', 'result2'),
+          tuple('', 'result3')
+        );
+
+      const expected = 'result2';
       const actual = some(parser, 'string');
 
       assert.deepEqual(actual, expected);

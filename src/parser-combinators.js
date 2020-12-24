@@ -75,20 +75,20 @@ const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 
 const uncurriedMany = (p, str) => {
   return alternation(
-      sequence(p, many(p)),
+      sequence(p, many(p)), 
       succeed(emptyList(str)),
       str
   );
 };
 const many = curry(uncurriedMany);
 
-const uncurriedOption = (p, str) => {
-  return alternation(
+const uncurriedOption = (p, str) => 
+  alternation(
       apply(x => list(x), p),
       apply(x => emptyList(x), epsilon),
       str
   );
-}
+
 const option = curry(uncurriedOption);
 
 

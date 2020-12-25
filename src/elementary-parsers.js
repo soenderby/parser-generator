@@ -17,10 +17,10 @@ const uncurriedSymbol = (symbol, str) => {
   const isSymbol = s => head(s) === symbol;
 
   return piecewise(
-      isEmpty, emptyList,
+      isEmpty, s => list(),
       isNonEmpty, piecewise(
           isSymbol, s => list(tuple(tail(s), symbol)),
-          otherwise, emptyList
+          otherwise, s => list()
       )
   )(str);
 }
@@ -64,7 +64,7 @@ const epsilon = succeed(tuple());
 // Not sure that this is needed when implementing in JavaScript
 // It accepts a str so it matches the signature a parser,
 // but it always returns an empty object
-const fail = str => emptyList(str);
+const fail = str => list();
 
 export {
   symbol,

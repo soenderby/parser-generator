@@ -75,20 +75,20 @@ const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 
 const uncurriedMany = (p, str) => {
   return alternation(
-      sequence(p, many(p)), 
-      succeed(emptyList(str)),
-      str
+    apply(t => list(fst(t), snd(t)), sequence(p, many(p))),
+    succeed(emptyList(str)),
+    str
   );
 };
 const many = curry(uncurriedMany);
 
-const uncurriedOption = (p, str) => 
-  alternation(
-      apply(x => list(x), p),
-      apply(x => emptyList(x), epsilon),
-      str
+const uncurriedOption = (p, str) => {
+  return alternation(
+    apply(x => list(x), p),
+    succeed(emptyList(str)),
+    str
   );
-
+}
 const option = curry(uncurriedOption);
 
 
@@ -101,8 +101,15 @@ const uncurriedBlock = (startDelimiter, contentParser, endDelimiter, string) => 
 }
 const block = curry(uncurriedBlock);
 
-const uncurriedListOf = (itemParser, separatorParser, string) => {
-  return sequence(itemParser, many(seqKeepSecond(separatorParser, itemParser)), string);
+const uncurriedListOf = (itemParser, separatorParser, str) => {
+  return alternation (
+    apply(
+      t => list(fst(t), snd(t)),
+      sequence(itemParser, many(seqKeepSecond(separatorParser, itemParser)))
+    ),
+    succeed(emptyList(str)),
+    str
+  );
 }
 
 const listOf = curry(uncurriedListOf);

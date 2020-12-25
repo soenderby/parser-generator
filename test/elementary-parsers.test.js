@@ -18,7 +18,7 @@ describe('Elementary parsers', () => {
       const charParameter = 'a';
       const inputString = "input text with a";
 
-      const expected = '';
+      const expected = list();
       const actual = symbol(charParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -28,7 +28,7 @@ describe('Elementary parsers', () => {
       const charParameter = 'a';
       const inputString = "input text";
 
-      const expected = '';
+      const expected = list();
       const actual = symbol(charParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -106,7 +106,7 @@ describe('Elementary parsers', () => {
     it('should accept input, and generate nothing', () => {
       const inputString = 'input text';
 
-      const expected = '';
+      const expected = list();
       const actual = fail(inputString);
 
       assert.deepEqual(actual, expected);

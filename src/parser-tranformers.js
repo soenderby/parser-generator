@@ -25,7 +25,7 @@ const just = curry(uncurriedJust);
       [ (remainder, func(value)) ]
 */
 const uncurriedApply = (func, parser, string) => {
-  return map(res => tuple(res.fst, func(res.snd)), parser(string) );
+  return map(res => tuple(res.fst, func(res.snd)), parser(string));
 }
 const apply = curry(uncurriedApply);
 

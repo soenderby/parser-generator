@@ -5,7 +5,7 @@ import * as chai from 'chai';
 //TODO type-check to see if all args are of the same type
 const list = (...args) => {
   if (args.length > 0 && args.every(isString))
-    return args.join();
+    return args.join('');
 
   return function* () {
     for (const arg of args) {

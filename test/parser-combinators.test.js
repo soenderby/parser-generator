@@ -16,11 +16,7 @@ import {
   curry
 } from '../src/utils';
 
-const parseA = str => {
-  if (head(str) === 'a')
-    return list(tuple(tail(str), 'a'));
-  return emptyList(str);
-};
+const parseA = str => (head(str) === 'a') ? list(tuple(tail(str), 'a')) : list();
 
 const parseSingleChar = str => list(tuple(tail(str), head(str)));
 
@@ -99,16 +95,15 @@ describe('Parser combinators', () => {
       assert.deepEqual(actual, expected);
     });
 
-    it('should not add undefined elements to the result', () => {
-      const parseOneItem = str => list(tuple(head(str), tail(str)));
-      const failingParser = fail;
+    it('should only return success of first parser if second parser fails', () => {
+      const parseOneItem = str => list(tuple(tail(str), head(str)));
 
       const inputString = 'input';
 
       const expected = list(
-        tuple('i', 'nput')
+        tuple('nput', 'i')
       );
-      const actual = alternation(parseOneItem, failingParser, inputString);
+      const actual = alternation(parseOneItem, fail, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -140,7 +135,7 @@ describe('Parser combinators', () => {
     it('should apply a given parser multiple times if successful', () => {
       const inputString = 'aaab';
 
-      const expected = list(tuple('b', 'aaa'));
+      const expected = list(tuple('b', 'aaa'), tuple('ab', 'aa'), tuple('aab', 'a'), tuple('aaab', ''));
       const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -158,7 +153,7 @@ describe('Parser combinators', () => {
     it('should apply a given parser multiple times until it fails', () => {
       const inputString = 'abaa';
 
-      const expected = list(tuple('baa', 'a'));
+      const expected = list(tuple('baa', 'a'), tuple('abaa', ''));
       const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -179,7 +174,7 @@ describe('Parser combinators', () => {
     it('should return a list with a single resulting element if parser was recognised', () => {
       const inputString = 'abaa';
 
-      const expected = list(tuple('baa', 'a'));
+      const expected = list(tuple('baa', 'a'), tuple('abaa', ''));
       const actual = option(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -219,9 +214,14 @@ describe('Parser combinators', () => {
     });
 
     it('should parse a non-empty list given parser for the items', () => {
-      const inputString = 'a,a,apost list';
+      const inputString = 'a,a,a,post list';
 
-      const expected = list(tuple('post list', list('a', 'a', 'a')));
+      const expected = list(
+        tuple(',post list', 'aaa'),
+        tuple(',a,post list', 'aa'),
+        tuple(',a,a,post list', 'a'),
+        tuple('a,a,a,post list', '')
+      );
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);

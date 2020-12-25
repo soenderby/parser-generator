@@ -14,12 +14,14 @@ const list = (...args) => {
   }
 }
 // a single arg indicates whether to make an empty string or an empty list
-const emptyList = (...args) => {
-  if (args.length === 0)
+const emptyList = (obj) => {
+  if (isString(obj))
+    return '';
+
+  if (isList(obj))
     return list();
-  else if (args.length === 1)
-    return isString(args[0]) ? '' : list();
-  else Error('emptyList expects at most 2 arguments');
+
+  throw TypeError(`expects obj ${obj} to be string or list`);
 }
 
 const recursiveList = (...args) => {

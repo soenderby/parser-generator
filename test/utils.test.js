@@ -32,7 +32,7 @@ describe('Utils', () => {
 
   describe('emptyList', () => {
     it('should satisfy isList', () => {
-      assert.isTrue(isList(emptyList()));
+      assert.isTrue(isList(emptyList(list())));
     });
   });
 
@@ -102,15 +102,15 @@ describe('Utils', () => {
   /* List functions */
   describe('concat', () => {
     it('should return emptyList if given emptyLists', () => {
-      const expected = emptyList();
-      const actual = concat(emptyList(), emptyList());
+      const expected = list();
+      const actual = concat(list(), list());
 
       assert.deepEqual(actual, expected);
     });
 
     it('should return list if given empty list and list', () => {
       const expected = list(0, 1, 2);
-      const actual = concat(emptyList(), list(0, 1, 2));
+      const actual = concat(list(), list(0, 1, 2));
 
       assert.deepEqual(actual, expected);
     });
@@ -188,7 +188,7 @@ describe('Utils', () => {
 
   describe('isEmpty', () => {
     it('should return true if given empty list', () => {
-      assert.isTrue(isEmpty(emptyList()));
+      assert.isTrue(isEmpty(list()));
     });
 
     it ('should return false if given non-empty list', () => {
@@ -210,7 +210,7 @@ describe('Utils', () => {
     });
 
     it('should return false if given empty list', () => {
-      assert.isFalse(isNonEmpty(emptyList()));
+      assert.isFalse(isNonEmpty(list()));
     });
 
     it('should return true if given non-empty string', () => {

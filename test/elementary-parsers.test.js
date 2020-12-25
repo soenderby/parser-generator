@@ -106,7 +106,7 @@ describe('Elementary parsers', () => {
     it('should accept input, and generate nothing', () => {
       const inputString = 'input text';
 
-      const expected = list();
+      const expected = '';
       const actual = fail(inputString);
 
       assert.deepEqual(actual, expected);

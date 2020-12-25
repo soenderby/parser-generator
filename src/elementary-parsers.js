@@ -64,7 +64,7 @@ const epsilon = succeed(tuple());
 // Not sure that this is needed when implementing in JavaScript
 // It accepts a str so it matches the signature a parser,
 // but it always returns an empty object
-const fail = str => emptyList();
+const fail = str => emptyList(str);
 
 export {
   symbol,

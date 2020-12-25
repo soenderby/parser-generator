@@ -50,7 +50,7 @@ const recursiveList = (...args) => {
 }
 
 const tuple = (...args) => {
-  if (args.length >= 2)
+  if (args.length > 2)
     throw Error('tuple only supports up to 2 arguments')
 
   return {
@@ -62,9 +62,11 @@ const tuple = (...args) => {
 /* Data types (duck typing) */
 const isArray = obj => Array.isArray(obj);
 const isFunction = obj => typeof obj === 'function';
+const isNumber = obj => typeof obj === 'number';
 const isList = obj => obj !== null && obj !== undefined && obj.constructor.name === 'GeneratorFunction';
 const isString = obj => typeof obj === 'string';
 const isTuple = obj => obj.hasOwnProperty('fst') && obj.hasOwnProperty('snd');
+const isBoolean = obj => typeof obj === 'boolean';
 
 const isAllArray = (...args) => args.every(isArray);
 const areAllList = (...args) => args.every(isList);
@@ -103,124 +105,159 @@ const curry = R.curry;
 
 /* List functions */
 const concat = (list1, list2) => {
-  if (!areAllList(list1, list2)) {
-    if (isList(list1) || isList(list2)) {
-      throw Error('concat can not concatenate list and non-list');
-    }
+  if ((isArray(list1) && isArray(list2)) || (isString(list1) && isString(list2)))
     return R.concat(list1, list2);
-  }
 
-  return function* () {
-    for (const item of list1()) {
-      yield item;
+  if (isList(list1) && isList(list2)){
+    return function* () {
+      for (const item of list1()) {
+        yield item;
+      }
+      for (const item of list2()) {
+        yield item;
+      }
     }
-    for (const item of list2()) {
-      yield item;
+  }
+  throw TypeError(`cannot concat list1 ${list1} and list2 ${list2}`);
+}
+
+const drop = (n, list) => {
+  if (!isNumber(n))
+    throw TypeError(`expected n ${n} to be a number`);
+
+  if (isArray(list) || isString(list))
+    return R.drop(n, list);
+
+  if (isList(list)){
+    return function* () {
+      let iterator = list();
+
+      for (let i = 0; i < n; i++) {
+        if (iterator.next().done)
+          break;
+      }
+      for (const item of iterator) {
+        yield item;
+      }
     }
   }
+  throw TypeError(`expected list ${list} to be array, string or list`);
 }
 
-const dropList = (n, list) => function* () {
-  let iterator = list();
+const map = (f, list) => {
+  if (!isFunction(f))
+    throw TypeError(`expected f ${f} to be a function`);
 
-  for (let i = 0; i < n; i++) {
-    if (iterator.next().done)
-      break;
+  if (isList(list)){
+    return function* () {
+      for (let item of list()) {
+        yield f(item);
+      }
+    }
   }
-  for (const item of iterator) {
-    yield item;
+  return R.map(f, list);
+}
+
+const fmap = (f, obj) =>  {
+  if (!isFunction(f))
+    throw TypeError(`expected f ${f} to be a function`);
+
+  if (isList(obj)) {
+    return function* () {
+      for (let item of obj()) {
+        let result = f(item);
+
+        if (!isList(result))
+          throw TypeError(`expected f ${f} to return a list when obj is a list`);
+
+        yield* result();
+      }
+    }
   }
+  return R.chain(f, obj);
 }
-const dropString = (n, str) => {
-  return str.slice(n, str.length);
-}
-const drop = piecewise(
-  (n, obj) => isList(obj), dropList,
-  (n, obj) => isString(obj), dropString,
-  otherwise, notSupportedError
-);
 
-const mapList = (f, list) => function* () {
-  for (var item of list()) {
-    yield f(item);
+const filter = (f, obj) => {
+  if (!isFunction(f))
+    throw TypeError(`expected f ${f} to be a function`);
+
+  if (isList(obj)) {
+    return function* () {
+      for (let item of obj()) {
+        let result = f(item);
+
+        if (!isBoolean(result))
+          throw TypeError(`expected f ${f} to return a boolean`);
+
+        if(result)
+          yield item;
+      }
+    }
   }
-}
-const map = piecewise(
-  (f, obj) => isList(obj), mapList,
-  otherwise, R.map
-);
-
-const fmapList = (f, list) => function* () {
-  for (var item of list()) {
-    yield* f(item)();
-  }
+  return R.filter(f, obj);
 }
 
-const fmap = piecewise(
-  (f, obj) => isList(obj), fmapList,
-  otherwise, R.chain
-);
+const isEmpty = (obj) => {
+  if (isString(obj) || isArray(obj))
+    return R.isEmpty(obj);
 
-const filterList = (f, list) => function* () {
-  for (var item of list()) {
-    if(f(item))
-      yield item;
-  }
+  if (isList(obj))
+    return obj().next().done;
+
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
-
-const filter = piecewise(
-  (f, obj) => isList(obj), filterList,
-  otherwise, R.filter
-)
-
-const isEmptyList = (list) => {
-  for (let e of list())
-    return false;
-  return true;
-};
-const isEmpty = piecewise(
-  isList, isEmptyList,
-  otherwise, R.isEmpty,
-);
 
 const isNonEmpty = obj => !isEmpty(obj);
 
-const headList = (list) => {
-  return list().next().value;
+const head = (obj) => {
+  if (isArray(obj) || isString(obj))
+    return R.head(obj);
+
+  if (isList(obj))
+    return obj().next().value;
+
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
-const head = piecewise(
-  isList, headList,
-  otherwise, R.head
-);
 
-const tailList = (list) => function* () {
-  let iterator = list();
-  iterator.next();
+const tail = (obj) => {
+  if (isArray(obj) || isString(obj))
+    return R.tail(obj);
 
-  for (const item of iterator) {
-    yield item;
+  if (isList(obj)) {
+    return function* () {
+      let iterator = obj();
+
+      iterator.next();
+
+      for (const item of iterator)
+        yield item;
+    }
   }
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
-const tail = piecewise(
-  isList, tailList,
-  otherwise, R.tail
-);
 
-const takeList = (n, list) => function* () {
-  let iterator = list();
+const take = (n, obj) => {
+  if (!isNumber(n))
+    throw TypeError(`expected n ${n} to be a number`);
 
-  for (let i = 0; i < n; i++) {
-    let iteration = iterator.next();
+  if (isArray(obj) || isString(obj))
+    return R.take(n, obj);
 
-    if (iteration.done)
-      break;
-    else yield iteration.value;
+  if (isList(obj)){
+    return function* () {
+      let iterator = obj();
+
+      for (let i = 0; i < n; i++) {
+        let iteration = iterator.next();
+
+        if (iteration.done)
+          break;
+        else yield iteration.value;
+      }
+    }
   }
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
-const take = piecewise(
-  (n, obj) => isList(obj), takeList,
-  otherwise, R.take
-);
 
 /* Test methods */
 const listToArray = (list, maxLength = 100) => {
@@ -270,21 +307,19 @@ chai.use(function (_chai, utils) {
 });
 
 /* Tuple methods */
-const fstTuple = t => {
-  return t.fst;
-}
-const fst = piecewise(
-  isTuple, fstTuple,
-  otherwise, notSupportedError
-);
+const fst = obj => {
+  if (!isTuple(obj))
+    throw TypeError(`expected obj ${obj} to be a tuple`);
 
-const sndTuple = t => {
-  return t.snd;
+  return obj.fst;
 }
-const snd = piecewise(
-  isTuple, sndTuple,
-  otherwise, notSupportedError
-);
+
+const snd = obj => {
+  if (!isTuple(obj))
+    throw TypeError(`expected obj ${obj} to be a tuple`);
+
+  return obj.snd;
+}
 
 export {
   concat,

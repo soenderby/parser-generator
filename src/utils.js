@@ -8,8 +8,8 @@ const list = (...args) => {
     return args.join();
 
   return function* () {
-    for (let i = 0; i < args.length; i++) {
-      yield args[i];
+    for (const arg of args) {
+      yield arg
     }
   }
 }
@@ -111,23 +111,11 @@ const concat = (list1, list2) => {
   }
 
   return function* () {
-    const iterator1 = list1();
-    const iterator2 = list2();
-
-    while (true) {
-      let iteration = iterator1.next();
-
-      if (iteration.done)
-        break;
-      else yield iteration.value;
+    for (const item of list1()) {
+      yield item;
     }
-
-    while (true) {
-      let iteration = iterator2.next();
-
-      if (iteration.done)
-        break;
-      else yield iteration.value;
+    for (const item of list2()) {
+      yield item;
     }
   }
 }
@@ -139,12 +127,8 @@ const dropList = (n, list) => function* () {
     if (iterator.next().done)
       break;
   }
-
-  while (true) {
-    let iteration = iterator.next();
-    if (iteration.done)
-      break;
-    else yield iteration.value;
+  for (const item of iterator) {
+    yield item;
   }
 }
 const dropString = (n, str) => {
@@ -157,14 +141,8 @@ const drop = piecewise(
 );
 
 const mapList = (f, list) => function* () {
-  const iterator = list();
-
-  while (true) {
-    let iteration = iterator.next();
-
-    if (iteration.done)
-      break;
-    else yield f(iteration.value);
+  for (var item of list()) {
+    yield f(item);
   }
 }
 const map = piecewise(
@@ -173,14 +151,8 @@ const map = piecewise(
 );
 
 const fmapList = (f, list) => function* () {
-  const iterator = list();
-
-  while (true) {
-    let iteration = iterator.next();
-
-    if (iteration.done)
-      break;
-    else yield* f(iteration.value)();
+  for (var item of list()) {
+    yield* f(item)();
   }
 }
 
@@ -190,15 +162,9 @@ const fmap = piecewise(
 );
 
 const filterList = (f, list) => function* () {
-  const iterator = list();
-
-  while (true) {
-    let iteration = iterator.next();
-
-    if (iteration.done)
-      break;
-    else if (f(iteration.value))
-      yield iteration.value;
+  for (var item of list()) {
+    if(f(item))
+      yield item;
   }
 }
 
@@ -231,12 +197,8 @@ const tailList = (list) => function* () {
   let iterator = list();
   iterator.next();
 
-  while (true) {
-    let iteration = iterator.next();
-
-    if (iteration.done)
-      break;
-    else yield iteration.value;
+  for (const item of iterator) {
+    yield item;
   }
 }
 const tail = piecewise(

@@ -50,7 +50,7 @@ const recursiveList = (...args) => {
 }
 
 const tuple = (...args) => {
-  if (args.length >= 3)
+  if (args.length >= 2)
     throw Error('tuple only supports up to 2 arguments')
 
   return {

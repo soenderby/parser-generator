@@ -232,12 +232,15 @@ describe('Parser combinators', () => {
     it('should apply parser for item and separator from left to right', () => {
       const inputString = '1+1+1 rest';
 
-      const separatorParser = string => {
-        return list(tuple(string.slice(1), (elementOne => elementTwo => '(' + elementOne + '+' + elementTwo + ')')));
-      } 
+      const separatorParser = str => list(tuple(drop(1, str), e1 => e2 => `(${e1}+${e2})`));
+
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
-      const expected = list(tuple(' rest', '(((1+1)+1)+1)'));
+      const expected = list(
+        tuple(' rest', '((1+1)+1)'),
+        tuple('+1 rest', '(1+1)'),
+        tuple('+1+1 rest', '1')
+      );
       const actual = chainLeft(symbol('1'), separatorParser, inputString);
 
       assert.deepEqual(actual, expected);

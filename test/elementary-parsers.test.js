@@ -50,7 +50,7 @@ describe('Elementary parsers', () => {
       const tokenParameter = 'token';
       const inputString = "nothing then token and the rest";
 
-      const expected = '';
+      const expected = list();
       const actual = token(tokenParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -72,7 +72,7 @@ describe('Elementary parsers', () => {
       const predicate = x => x === 'a';
       const inputString = 'b';
 
-      const expected = '';
+      const expected = list();
       const actual = satisfy(predicate, inputString);
 
       assert.deepEqual(actual, expected);

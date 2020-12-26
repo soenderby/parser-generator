@@ -2,7 +2,11 @@ import * as R from 'ramda';
 import * as chai from 'chai';
 
 /* Data structures */
-//TODO type-check to see if all args are of the same type
+/**
+ * Creates a new list
+ * @callback list = function(): Generator<*, void, ?>
+ * @returns { list | string }
+ */
 const list = (...args) => {
   if (args.length > 0 && args.every(isString))
     return args.join('');
@@ -13,7 +17,12 @@ const list = (...args) => {
     }
   }
 }
-// a single arg indicates whether to make an empty string or an empty list
+
+/**
+ * Creates an empty list of the same type as obj
+ * @param {list | string} obj
+ * @return {list | string}
+ */
 const emptyList = (obj) => {
   if (isString(obj))
     return '';
@@ -51,6 +60,11 @@ const recursiveList = (...args) => {
   }
 }
 
+/**
+ * Create a new tuple of up to two arguments
+ * @typedef {{fst: *, snd: *}} tuple
+ * @returns {tuple}
+ */
 const tuple = (...args) => {
   if (args.length > 2)
     throw Error('tuple only supports up to 2 arguments')
@@ -62,12 +76,53 @@ const tuple = (...args) => {
 }
 
 /* Data types (duck typing) */
+/**
+ * Determines whether or not obj is an array
+ * @param {*} obj
+ * @return {boolean}
+ */
 const isArray = obj => Array.isArray(obj);
+
+/**
+ * Determines whether or not obj is a function
+ * @param {*} obj
+ * @return {boolean}
+ */
 const isFunction = obj => typeof obj === 'function';
+
+/**
+ * Determines whether or not obj is a number
+ * @param {*} obj
+ * @return {boolean}
+ */
 const isNumber = obj => typeof obj === 'number';
+
+/**
+ * Determines whether or not obj is a list
+ * @param {*} obj
+ * @return {boolean}
+ */
 const isList = obj => obj !== null && obj !== undefined && obj.constructor.name === 'GeneratorFunction';
+
+/**
+ * Determines whether or not obj is a string
+ * @param obj
+ * @return {boolean}
+ */
 const isString = obj => typeof obj === 'string';
+
+/**
+ * Determines whether or not obj is a tuple
+ * @param obj
+ * @return {boolean}
+ */
 const isTuple = obj => obj.hasOwnProperty('fst') && obj.hasOwnProperty('snd');
+
+/**
+ * Determines whether or not obj is a boolean
+ * @param obj
+ * @return {boolean}
+ */
 const isBoolean = obj => typeof obj === 'boolean';
 
 const isAllArray = (...args) => args.every(isArray);
@@ -103,9 +158,18 @@ const notSupportedError = obj => {
   throw Error(`Does not support ${obj}`);
 };
 
+/**
+ * Curries functions (alias of R.curry)
+ */
 const curry = R.curry;
 
 /* List functions */
+/**
+ * Concatenates two lists of the same type
+ * @param {array | list | string} list1
+ * @param {array | list | string} list2
+ * @returns {array | list | string}
+ */
 const concat = (list1, list2) => {
   if ((isArray(list1) && isArray(list2)) || (isString(list1) && isString(list2)))
     return R.concat(list1, list2);
@@ -123,6 +187,12 @@ const concat = (list1, list2) => {
   throw TypeError(`cannot concat list1 ${list1} and list2 ${list2}`);
 }
 
+/**
+ * Drops n number of elements of a list
+ * @param {number} n - number of elements to skip
+ * @param {array | list | string} list
+ * @returns {array | list | string}
+ */
 const drop = (n, list) => {
   if (!isNumber(n))
     throw TypeError(`expected n ${n} to be a number`);
@@ -146,6 +216,12 @@ const drop = (n, list) => {
   throw TypeError(`expected list ${list} to be array, string or list`);
 }
 
+/**
+ * Applies f to all elements in list
+ * @param {function} f
+ * @param {list | *} list
+ * @returns {list | *}
+ */
 const map = (f, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
@@ -160,6 +236,11 @@ const map = (f, list) => {
   return R.map(f, list);
 }
 
+/**
+ * Applies f to all elements in list and flattens list
+ * @param {function:list | *} f
+ * @param {list | *} obj
+ */
 const fmap = (f, obj) =>  {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
@@ -179,6 +260,12 @@ const fmap = (f, obj) =>  {
   return R.chain(f, obj);
 }
 
+/**
+ * Filters list for elements
+ * @param {function} f - predicate
+ * @param {list | *} obj - list
+ * @returns {list | *}
+ */
 const filter = (f, obj) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
@@ -199,6 +286,11 @@ const filter = (f, obj) => {
   return R.filter(f, obj);
 }
 
+/**
+ * Determines whether or not a list has any elements
+ * @param {array| list | string} obj - list of elements
+ * @returns {boolean}
+ */
 const isEmpty = (obj) => {
   if (isString(obj) || isArray(obj))
     return R.isEmpty(obj);
@@ -209,8 +301,18 @@ const isEmpty = (obj) => {
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
+/**
+ * Determines whether or not a list has any elements (inverse of isEmpty)
+ * @param {array | list | string} obj - list of elements
+ * @returns {boolean}
+ */
 const isNonEmpty = obj => !isEmpty(obj);
 
+/**
+ * Takes the first element of a list
+ * @param {array | list | string} obj - list of elements
+ * @returns {*}
+ */
 const head = (obj) => {
   if (isArray(obj) || isString(obj))
     return R.head(obj);
@@ -221,6 +323,11 @@ const head = (obj) => {
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
+/**
+ * Drops first element in a list
+ * @param {array | list | string} obj - list of elements
+ * @returns {array | list | string}
+ */
 const tail = (obj) => {
   if (isArray(obj) || isString(obj))
     return R.tail(obj);
@@ -238,6 +345,12 @@ const tail = (obj) => {
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
+/**
+ * Takes n number of elements in a list
+ * @param {number} n - number of elements to take
+ * @param {array | list | string} obj - list of elements
+ * @returns {array | list | string}
+ */
 const take = (n, obj) => {
   if (!isNumber(n))
     throw TypeError(`expected n ${n} to be a number`);
@@ -262,6 +375,12 @@ const take = (n, obj) => {
 }
 
 /* Test methods */
+/**
+ * Converts list into an array
+ * @param {list} list
+ * @param {number} maxLength - maximum number of elements copied into array
+ * @returns {[]}
+ */
 const listToArray = (list, maxLength = 100) => {
   const array = [];
   const iterator = list.apply();
@@ -276,7 +395,14 @@ const listToArray = (list, maxLength = 100) => {
   return array;
 }
 
-const listToArrayRecursively = (obj, maxLength, depth = 0) => {
+/**
+ * Converts list-type properties to array-type properties of an objects and any sub-objects
+ * @param {*} obj
+ * @param {number} maxLength - maximum number of list elements copied into array
+ * @param {number} depth - maximum depth into sub-objects
+ * @returns {*}
+ */
+const listToArrayRecursively = (obj, maxLength = 100, depth = 0) => {
   const func = e => listToArrayRecursively(e, maxLength, depth + 1);
 
   if (depth > 10)
@@ -294,21 +420,28 @@ const listToArrayRecursively = (obj, maxLength, depth = 0) => {
   } else return obj;
 }
 
+/**
+ * Chai plugin, which overwrites the eql method, which is called recursively by assert.deepEqual, to support list comparisons
+ */
 chai.use(function (_chai, utils) {
-  // Overwrites the eql method, which is called recursively by assert.deepEqual, to support list comparisons
+  //
   utils.overwriteMethod(_chai.Assertion.prototype, 'eql', function (_super) {
     return function (str, i = 0) {
       if (i === 0) {
         str = listToArrayRecursively(str);
         this.__flags.object = listToArrayRecursively(this.__flags.object);
       }
-      //chai.assert.deepEqual(str, this.__flags.obj);
       _super.apply(this, [str, i + 1]);
     }
   });
 });
 
 /* Tuple methods */
+/**
+ * Takes the first element of a tuple
+ * @param {tuple} obj - tuple
+ * @returns {*}
+ */
 const fst = obj => {
   if (!isTuple(obj))
     throw TypeError(`expected obj ${obj} to be a tuple`);
@@ -316,6 +449,11 @@ const fst = obj => {
   return obj.fst;
 }
 
+/**
+ * Takes the second element of a tuple
+ * @param {tuple} obj - tuple
+ * @returns {*}
+ */
 const snd = obj => {
   if (!isTuple(obj))
     throw TypeError(`expected obj ${obj} to be a tuple`);

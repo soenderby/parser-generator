@@ -1,69 +1,99 @@
 import {
   tuple,
-  piecewise,
   head,
   tail,
   isEmpty,
-  isNonEmpty,
-  otherwise,
   list,
-  emptyList,
   take,
   drop,
   curry
 } from './utils';
 
-const uncurriedSymbol = (symbol, str) => {
-  const isSymbol = s => head(s) === symbol;
+/**
+ * This parser only parses the symbol 'a'
+ * @param {string} str - input string symbols
+ * @return {list} - list of success
+ */
+const symbola = (str) => {
+  const x = head(str);
+  const xs = tail(str);
 
-  return piecewise(
-      isEmpty, s => list(),
-      isNonEmpty, piecewise(
-          isSymbol, s => list(tuple(tail(s), symbol)),
-          otherwise, s => list()
-      )
-  )(str);
+  return isEmpty(str) ? list()
+                      : x === 'a' ? list(tuple(xs, 'a'))
+                                  : list();
+};
+
+/**
+ * This parses parses a predefined symbol
+ * @param {string} a - symbol to parse
+ * @param {string} str - input string symbols
+ * @returns {list} - list of success
+ */
+const uncurriedSymbol = (a, str) => {
+  const x = head(str);
+  const xs = tail(str);
+
+  return isEmpty(str) ? list()
+                      : a === x ? list(tuple(xs, x))
+                                : list();
 }
+/** @see uncurriedSymbol */
 const symbol = curry(uncurriedSymbol);
 
-// Same as symbol, but for strings instead of single characters
-const uncurriedToken = (token, str) => {
-  const n = token.length;
-  const isToken = s => token === take(n, s);
+/**
+ * This parser parses a predefined token
+ * Similar to symbol, but for strings instead of single characters
+ * @param k - token to parse
+ * @param xs - input string symbols
+ * @returns {list} - list of success
+ */
+const uncurriedToken = (k, xs) => {
+  const n = k.length;
 
-  return piecewise(
-      isToken, s => list(tuple(drop(n, s), token)),
-      otherwise, emptyList
-  )(str);
+  return k === take(n, xs) ? list(tuple(drop(n, xs), k))
+                           : list();
 };
+/** @see uncurriedToken */
 const token = curry(uncurriedToken);
 
-// Returns a parser if predicate is true for input string
-const uncurriedSatisfy = (predicate, str) => {
-  const isSatisfying = s => predicate(head(s));
+/**
+ * This parser parses an arbitrary token if it satisfies the predicate
+ * @param {function(*): boolean} p - predicate
+ * @param str - input string symbols
+ * @returns {list} - list of success
+ */
+const uncurriedSatisfy = (p, str) => {
+  const x = head(str);
+  const xs = tail(str);
 
-  return piecewise(
-      isEmpty, emptyList,
-      isNonEmpty, piecewise(
-          isSatisfying, s => list(tuple(tail(s), head(s))),
-          otherwise, emptyList
-      )
-  )(str);
+  return isEmpty(str) ? list()
+                      : p(x) ? list(tuple(xs, x))
+                             : list();
 }
+/** @see uncurriedSatisfy */
 const satisfy = curry(uncurriedSatisfy);
 
-// Always returns the given value as result, and the entire inputstr as remainder
-const uncurriedSucceed = (value, str) => {
-  return list(tuple(str, value));
-}
+/**
+ * Always returns the given value as result, and the entire xs as remainder
+ * @param v - value to return
+ * @param xs - input string symbols
+ * @returns {list} - list of success
+ */
+const uncurriedSucceed = (v, xs) => list(tuple(xs, v));
+/** @see uncurriedSucceed */
 const succeed = curry(uncurriedSucceed);
 
-// Returns empty result and entire inputstr as result
+/**
+ * @returns zero-tuple and entire inputstr as result
+ */
 const epsilon = succeed(tuple());
 
-// Not sure that this is needed when implementing in JavaScript
-// It accepts a str so it matches the signature a parser,
-// but it always returns an empty object
+/**
+ * Accepts a str so it matches the signature a parser,
+ * but it always returns an empty object
+ * @param str {string}
+ * @returns {list}
+ */
 const fail = str => list();
 
 export {

@@ -1,25 +1,25 @@
 import { assert } from 'chai';
-import { removeLeadingWhitespace, just, apply, some } from '../src/parser-tranformers';
+import { sp, just, apply, some } from '../src/parser-tranformers';
 import { tuple, list } from '../src/utils';
 
 describe('Parser transformers', () => {
-  describe('removeLeadingWhitespace', () => {
-    it('should make a parser ignore leading whitespace', () => {
+  describe('sp', () => {
+    it('should make a parser ignore leading spaces', () => {
       const parseOneItem = string => list(tuple(string.slice(1), string.slice(0, 1)));
-      const inputString = '   \n a';
+      const inputString = '    a';
 
       const expected = list(tuple( '', 'a' ));
-      const actual = removeLeadingWhitespace(parseOneItem, inputString);
+      const actual = sp(parseOneItem, inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should leave trailing whitespace', () => {
       const parseOneItem = string => list(tuple( string.slice(1), string.slice(0, 1) ));
-      const inputString = '   \n ab   ';
+      const inputString = '    ab   ';
 
       const expected = list(tuple( 'b   ', 'a' ));
-      const actual = removeLeadingWhitespace(parseOneItem, inputString);
+      const actual = sp(parseOneItem, inputString);
 
       assert.deepEqual(actual, expected);
     });

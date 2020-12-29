@@ -217,6 +217,42 @@ const drop = (n, list) => {
 }
 
 /**
+ * Drops elements as long as predicate is satisfied
+ * @param {function(*): boolean} f - predicate
+ * @param {array | list | string} list
+ * @returns {array | list | string}
+ */
+const dropWhile = (f, list) => {
+  if (!isFunction(f))
+    throw TypeError(`expected n ${n} to be a function`);
+
+  if (isArray(list) || isString(list))
+    return R.dropWhile(f, list);
+
+  if (isList(list)){
+    return function* () {
+      let iterator = list();
+
+      while(true) {
+        let iteration = iterator.next();
+        let isSatisfied = f(iteration.value);
+
+        if (!isBoolean(isSatisfied))
+          throw TypeError('expected f to return boolean');
+
+        if (!isSatisfied || iteration.done)
+          break;
+      }
+      for (const item of iterator) {
+        yield item;
+      }
+    }
+  }
+  throw TypeError(`expected list ${list} to be array, string or list`);
+}
+
+
+/**
  * Applies f to all elements in list
  * @param {function} f
  * @param {list | *} list
@@ -485,5 +521,6 @@ export {
   tuple,
   curry,
   recursiveList,
-  isString
+  isString,
+  dropWhile
 }

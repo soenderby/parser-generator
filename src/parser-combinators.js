@@ -1,4 +1,4 @@
-import { epsilon, succeed } from './elementary-parsers';
+import { epsilon, succeed, symbol } from './elementary-parsers';
 import { apply } from './parser-tranformers';
 import { curry, chain } from 'ramda';
 import {
@@ -18,22 +18,15 @@ import {
     isString
 } from './utils';
 
-// Execute two parsers in sequence. The second is applied to the remainder of the first
-/*
-  should return data with structure:
-  list(
-    tuple(
-      second parser remainder,
-      tuple(
-        result of first parser, 
-        result of second parser
-      )
-    )
-    ...
-  )
-*/
-const uncurriedSequence = (firstParser, secondParser, str) =>
-  fmap(
+/**
+ * Execute two parsers in sequence. The second is applied to the remainder of the first
+ * @param {function(string): list} p1 - first parser
+ * @param {function(string): list} p2 - second parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedSequence = (p1, p2, str) => {
+  return fmap(
     t1 => {
       const xs1 = fst(t1);
       const v1 = snd(t1);
@@ -45,34 +38,64 @@ const uncurriedSequence = (firstParser, secondParser, str) =>
 
           return tuple(xs2, tuple(v1, v2));
         },
-        secondParser(xs1)
+        p2(xs1)
       );
     },
-    firstParser(str)
+    p1(str)
   );
+}
+/** @see uncurriedSequence */
 const sequence = curry(uncurriedSequence);
 
-// Applies two parsers to the input string, and returns the possible results
+/**
+ * Applies two parsers to the input string, and returns the possible results
+ * @param {function(string): list} p1 - first parser
+ * @param {function(string): list} p2 - second parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
 const uncurriedAlternation = (p1, p2, str) => concat(p1(str), p2(str));
+/** @see uncurriedAlternation */
 const alternation = curry(uncurriedAlternation);
 
-// These applies two parsers in sequence, but only keeps the result of one of them
+/**
+ * Applies two parsers in sequence, but only keeps the result of first
+ * @param {function(string): list} p1 - first parser
+ * @param {function(string): list} p2 - second parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
 const uncurriedSeqKeepFirst = (p1, p2, str) => {
   return map(
-    t => tuple( t.fst, t.snd.fst ),
+    t => tuple(fst(t), fst(snd(t))),
     sequence(p1, p2, str)
   );
 }
+/** @see uncurriedSeqKeepFirst */
 const seqKeepFirst = curry(uncurriedSeqKeepFirst);
 
+/**
+ * Applies two parsers in sequence, but only keeps the result of second
+ * @param {function(string): list} p1 - first parser
+ * @param {function(string): list} p2 - second parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
 const uncurriedSeqKeepSecond = (p1, p2, str) => {
   return map(
-      e => tuple( e.fst, e.snd.snd ),
+      e => tuple(fst(e), snd(snd(e))),
       sequence(p1, p2, str)
   );
 }
+/** @see uncurriedSeqKeepSecond */
 const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 
+/**
+ * Applies a parser again and again until it fails
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
 const uncurriedMany = (p, str) => {
   return alternation(
     apply(t => list(fst(t), snd(t)), sequence(p, many(p))),
@@ -80,8 +103,15 @@ const uncurriedMany = (p, str) => {
     str
   );
 };
+/** @see uncurriedMany */
 const many = curry(uncurriedMany);
 
+/**
+ * Returns a list with zero or one element, depending on whether p is satisfied
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
 const uncurriedOption = (p, str) => {
   return alternation(
     apply(x => list(x), p),
@@ -89,39 +119,87 @@ const uncurriedOption = (p, str) => {
     str
   );
 }
+/** @see uncurriedOption */
 const option = curry(uncurriedOption);
 
-
-const uncurriedBlock = (startDelimiter, contentParser, endDelimiter, string) => {
+/**
+ * Parses a pack of symbols, starting with delimiter, content and ending in a deliminator
+ * @param {function(string): list} s1 - startDelimiter
+ * @param {function(string):list} p - contentParser
+ * @param {function(string): list} s2 endDelimiter
+ * @param {string} str - input string string
+ * @returns {list}
+ */
+const uncurriedPack = (s1, p, s2, str) => {
   return seqKeepFirst(
-      seqKeepSecond(startDelimiter, contentParser),
-      endDelimiter,
-      string
+      seqKeepSecond(s1, p),
+      s2,
+      str
   );
 }
-const block = curry(uncurriedBlock);
+/** @see uncurriedPack */
+const pack = curry(uncurriedPack);
 
-const uncurriedListOf = (itemParser, separatorParser, str) => {
+/**
+ * Parses symbols between two (matching) parenthesis
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedParenthesized = (p, str) => pack(symbol('('), p, symbol(')'), str);
+/** @see uncurriedParenthesized */
+const parenthesized = curry(uncurriedParenthesized);
+
+/**
+ * Parses symbols between two (matching) brackets
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedBracketed = (p, str) => pack(symbol('['), p, symbol(']'), str);
+/** @see uncurriedBracketed */
+const bracketed = curry(uncurriedBracketed);
+
+/**
+ * Parses symbols between 'begin' and 'end'
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedCompound = (p, str) => pack(symbol('begin'), p, symbol('end'), str);
+/** @see compound */
+const compound = curry(uncurriedCompound);
+
+/**
+ * Parses a list of items
+ * @param {function(string): list} p - item parser
+ * @param {function(string): list} s - separator parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedListOf = (p, s, str) => {
   return alternation (
     apply(
       t => list(fst(t), snd(t)),
-      sequence(itemParser, many(seqKeepSecond(separatorParser, itemParser)))
+      sequence(p, many(seqKeepSecond(s, p)))
     ),
     succeed(emptyList(str)),
     str
   );
 }
-
+/** @see uncurriedListOf */
 const listOf = curry(uncurriedListOf);
 
-// SeparatorParser should be accept a string and return a function that combines parse trees
-// according to the operation it describes
-const uncurriedChainLeft = (itemParser, separatorParser, string) => {
-  return apply()(sequence(itemParser, many(sequence(separatorParser, itemParser)), string));
+/**
+ * [Unfinished]
+ * SeparatorParser should be accept a string and return a function that combines parse trees
+ * according to the operation it describes
+ */
+const uncurriedChainLeft = (p, s, string) => {
+  return apply()(sequence(p, many(sequence(s, p)), string));
 }
-
+/** see uncurriedChainLeft */
 const chainLeft = curry(uncurriedChainLeft);
-
 
 export {
   sequence,
@@ -130,7 +208,7 @@ export {
   seqKeepSecond,
   many,
   option,
-  block,
+  pack,
   listOf,
   chainLeft
 }

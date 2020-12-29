@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, option, block, listOf, chainLeft, chainRight } from '../src/parser-combinators';
+import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
 import { fail, symbol } from '../src/elementary-parsers';
 import {
   tuple,
@@ -181,23 +181,23 @@ describe('Parser combinators', () => {
     });
   });
 
-  describe('block', () => {
+  describe('pack', () => {
     const parseToken = token => str => list(tuple(drop(token.length, str), take(token.length, str)));
 
     it('should parse a section that is between a start and end delimiter', () => {
-      const inputString = '{block}';
+      const inputString = '{pack}';
       
-      const expected = list(tuple( '', 'block' ));
-      const actual = block(symbol('{'), parseToken('block'), symbol('}'), inputString);
+      const expected = list(tuple( '', 'pack' ));
+      const actual = pack(symbol('{'), parseToken('pack'), symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should parse a section that is between a start and end delimiter, and return remainder', () => {
-      const inputString = '{block} remainder';
+      const inputString = '{pack} remainder';
       
-      const expected = list(tuple( ' remainder', 'block' ));
-      const actual = block(symbol('{'), parseToken('block'))(symbol('}'), inputString);
+      const expected = list(tuple( ' remainder', 'pack' ));
+      const actual = pack(symbol('{'), parseToken('pack'))(symbol('}'), inputString);
 
       assert.deepEqual(actual, expected);
     });

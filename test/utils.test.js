@@ -29,15 +29,15 @@ import {
 
 describe('Utils', () => {
   describe('Data structures', () => {
-    describe('list', () => {
-      it('should satisfy isList', () => {
-        assert.isTrue(isList(list()));
-      });
-    });
-
     describe('emptyList', () => {
       it('should satisfy isList', () => {
         assert.isTrue(isList(emptyList(list())));
+      });
+    });
+
+    describe('list', () => {
+      it('should satisfy isList', () => {
+        assert.isTrue(isList(list()));
       });
     });
 
@@ -73,7 +73,7 @@ describe('Utils', () => {
     });
   });
 
-  describe('common functions', () => {
+  describe('Common functions', () => {
     describe('piecewise', () => {
       it('should throw if given less than 2 arguments', () => {
         assert.throws(() => piecewise());
@@ -161,22 +161,6 @@ describe('Utils', () => {
       });
     });
 
-    describe('fmap', () => {
-      it('should concat lists when given identity function', () => {
-        const expected = list(1, 2, 3);
-        const actual = fmap(e => e, list(list(1), list(2), list(3)));
-
-        assert.deepEqual(actual, expected);
-      });
-
-      it('should return flat list when given function that produces list', () => {
-        const expected = list(2, 4, 6);
-        const actual = fmap(e => list(e * 2), list(1, 2, 3));
-
-        assert.deepEqual(actual, expected);
-      });
-    });
-
     describe('foldl', () => {
       const append = (xs, x) => concat(xs, list(x));
 
@@ -236,6 +220,22 @@ describe('Utils', () => {
       it('should return a reversed list if given list', () => {
         const expected = list(1, 2, 3);
         const actual = foldr(prepend, list(), list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+    });
+
+    describe('fmap', () => {
+      it('should concat lists when given identity function', () => {
+        const expected = list(1, 2, 3);
+        const actual = fmap(e => e, list(list(1), list(2), list(3)));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should return flat list when given function that produces list', () => {
+        const expected = list(2, 4, 6);
+        const actual = fmap(e => list(e * 2), list(1, 2, 3));
 
         assert.deepEqual(actual, expected);
       });
@@ -369,45 +369,6 @@ describe('Utils', () => {
   });
 
   describe('Test utility functions', () => {
-    describe('listToArray', () => {
-      it('should convert list to array', () => {
-        const expected = [1, 2, 3];
-        const actual = listToArray(list(1, 2, 3));
-
-        assert.deepEqual(actual, expected);
-      });
-    });
-
-    describe('listToArrayRecursively', () => {
-      it('should convert list of primitives to array of primitives', () => {
-        const expected = [1, 2, 3];
-        const actual = listToArrayRecursively(list(1, 2, 3));
-
-        assert.deepEqual(actual, expected);
-      });
-
-      it('should convert list of objects to array of objects', () => {
-        const expected = [{a: 1}, {a: 2}, {a: 3}];
-        const actual = listToArrayRecursively(list({a: 1}, {a: 2}, {a: 3}));
-
-        assert.deepEqual(actual, expected);
-      });
-
-      it('should convert list of lists to array of arrays', () => {
-        const expected = [[1], [2], [3]];
-        const actual = listToArrayRecursively(list(list(1), list(2), list(3)));
-
-        assert.deepEqual(actual, expected);
-      });
-
-      it('should convert list properties to array properties', () => {
-        const expected = {a: [1, 2, 3]};
-        const actual = listToArrayRecursively({a: list(1, 2, 3)});
-
-        assert.deepEqual(actual, expected);
-      });
-    });
-
     describe('chai deepEqual plugin', () => {
       it('should equate empty lists', () => {
         const data1 = list();
@@ -463,6 +424,45 @@ describe('Utils', () => {
         const data2 = list(list(1, 2, 2), list(1, 2, 3));
 
         assert.throws(() => assert.deepEqual(data1, data2));
+      });
+    });
+
+    describe('listToArray', () => {
+      it('should convert list to array', () => {
+        const expected = [1, 2, 3];
+        const actual = listToArray(list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+    });
+
+    describe('listToArrayRecursively', () => {
+      it('should convert list of primitives to array of primitives', () => {
+        const expected = [1, 2, 3];
+        const actual = listToArrayRecursively(list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should convert list of objects to array of objects', () => {
+        const expected = [{a: 1}, {a: 2}, {a: 3}];
+        const actual = listToArrayRecursively(list({a: 1}, {a: 2}, {a: 3}));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should convert list of lists to array of arrays', () => {
+        const expected = [[1], [2], [3]];
+        const actual = listToArrayRecursively(list(list(1), list(2), list(3)));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should convert list properties to array properties', () => {
+        const expected = {a: [1, 2, 3]};
+        const actual = listToArrayRecursively({a: list(1, 2, 3)});
+
+        assert.deepEqual(actual, expected);
       });
     });
   });

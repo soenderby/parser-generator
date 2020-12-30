@@ -98,7 +98,7 @@ const seqKeepSecond = curry(uncurriedSeqKeepSecond);
  */
 const uncurriedMany = (p, str) => {
   return alternation(
-    apply(t => list(fst(t), snd(t)), sequence(p, many(p))),
+    apply(t => concat(list(fst(t)), snd(t)), sequence(p, many(p))),
     succeed(emptyList(str)),
     str
   );

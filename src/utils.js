@@ -183,6 +183,12 @@ const curry = R.curry;
  * @returns {array | list | string}
  */
 const concat = (list1, list2) => {
+  if (isNonEmpty(list1) && isEmpty(list2))
+    return list1;
+
+  if (isEmpty(list1) && isNonEmpty(list2))
+    return list2;
+
   if ((isArray(list1) && isArray(list2)) || (isString(list1) && isString(list2)))
     return R.concat(list1, list2);
 
@@ -196,6 +202,7 @@ const concat = (list1, list2) => {
       }
     }
   }
+
   throw TypeError(`cannot concat list1 ${list1} and list2 ${list2}`);
 }
 

@@ -97,10 +97,11 @@ const epsilon = succeed(tuple());
 const fail = str => list();
 
 export {
-  symbol,
-  token,
-  satisfy,
   epsilon,
+  fail,
+  satisfy,
   succeed,
-  fail
+  symbol,
+  symbola,
+  token
 }

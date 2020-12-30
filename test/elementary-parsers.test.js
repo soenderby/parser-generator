@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { epsilon, fail, satisfy, succeed, symbol, token } from '../src/elementary-parsers';
+import { epsilon, fail, satisfy, succeed, symbol, symbola, token } from '../src/elementary-parsers';
 import { list, tuple } from '../src/utils';
 
 describe('Elementary parsers', () => {
@@ -86,6 +86,26 @@ describe('Elementary parsers', () => {
 
       const expected = list();
       const actual = symbol(charParameter, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('symbola', () => {
+    it('should parse a single char', () => {
+      const inputString = "an input text";
+
+      const expected = list(tuple('n input text', 'a'));
+      const actual = symbola(inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse symbol, only if it is the first char in string', () => {
+      const inputString = "input text with a";
+
+      const expected = list();
+      const actual = symbola(inputString);
 
       assert.deepEqual(actual, expected);
     });

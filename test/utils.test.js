@@ -191,6 +191,20 @@ describe('Utils', () => {
 
         assert.deepEqual(actual, expected);
       });
+
+      it('should be able to sum a list of numbers', () => {
+        const expected = 6;
+        const actual = foldl((a, b) =>  a + b, 0, list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to unparsed sum a list of numbers', () => {
+        const expected = '0 + 1 + 2 + 3';
+        const actual = foldl((a, b) =>  `${a} + ${b}`, 0, list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
     });
 
     describe('foldr', () => {
@@ -220,6 +234,20 @@ describe('Utils', () => {
       it('should return a reversed list if given list', () => {
         const expected = list(1, 2, 3);
         const actual = foldr(prepend, list(), list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to sum a list of numbers', () => {
+        const expected = 6;
+        const actual = foldr((a, b) =>  a + b, 0, list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to unparsed sum a list of numbers', () => {
+        const expected = '3 + 2 + 1 + 0';
+        const actual = foldr((a, b) =>  `${a} + ${b}`, 0, list(1, 2, 3));
 
         assert.deepEqual(actual, expected);
       });

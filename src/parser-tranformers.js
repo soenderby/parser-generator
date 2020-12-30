@@ -70,29 +70,6 @@ const uncurriedOptionalApply = (t, p, str) => {
 const optionalApply = curry(uncurriedOptionalApply);
 
 /**
- * checks whether or not c is a digit
- * @param {string} c - single character
- * @returns {boolean}
- */
-const isDigit = c => {
-  if (c.length !== 1)
-    throw new Error('expects only a single character');
-
-  return c === '0' || c === '1' || c === '2' || c === '3' || c === '4' || c === '5' || c === '6' || c === '7' || c === '8' || c === '9';
-}
-
-/**
- * Parses single digit character to a single integer
- * @param str - input string
- * @returns {list} - parse results
- */
-const digit = (str) => {
-  const f = c => c - '0';
-
-  return apply(satisfy(isDigit, str), f);
-}
-
-/**
  * It is possible that this should be able to handle lists of results.
  * It should also fail if there are no results with an empty remainder
  * @param p - parser to be applied
@@ -113,6 +90,5 @@ export {
   just,
   apply,
   optionalApply,
-  digit,
   some
 }

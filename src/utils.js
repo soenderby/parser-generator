@@ -98,6 +98,18 @@ const isFunction = obj => typeof obj === 'function';
 const isNumber = obj => typeof obj === 'number';
 
 /**
+ * checks whether or not c is a digit
+ * @param {string} c - single character
+ * @returns {boolean}
+ */
+const isDigit = c => {
+  if (c.length !== 1)
+    throw new Error('expects only a single character');
+
+  return c === '0' || c === '1' || c === '2' || c === '3' || c === '4' || c === '5' || c === '6' || c === '7' || c === '8' || c === '9';
+}
+
+/**
  * Determines whether or not obj is a list
  * @param {*} obj
  * @return {boolean}
@@ -503,6 +515,7 @@ export {
   emptyList,
   fst,
   head,
+  isDigit,
   isEmpty,
   isList,
   isNonEmpty,

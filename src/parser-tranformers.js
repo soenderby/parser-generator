@@ -1,5 +1,5 @@
 import {curry, compose } from 'ramda';
-import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction } from './utils';
+import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction, equals } from './utils';
 
 /**
  * drops initial spaces from input string, and then applies a
@@ -8,7 +8,7 @@ import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction } fr
  * @param {string} str - input string
  * @returns {list} parser output
  */
-const uncurriedSp = (p, str) => p(dropWhile(s => s === ' ', str));
+const uncurriedSp = (p, str) => p(dropWhile(equals(' '), str));
 /** @see uncurriedSp */
 const sp = curry(uncurriedSp);
 

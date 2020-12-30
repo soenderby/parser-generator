@@ -48,9 +48,9 @@ describe('Expression Parsers', () => {
   describe('fixed', () => {
     it('should parse string that contains a float and return result as a float', () => {
       const expected = 12.3;
-      const actual = firstParseResult(natural('12.3'));
+      const actual = firstParseResult(fixed('12.3'));
       
-      assert.deepEqual(actual, expected);
+      expect(actual).to.be.closeTo(expected, 0.01);
     });
   });
 });

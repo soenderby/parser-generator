@@ -1,7 +1,8 @@
 import { apply, optionalApply } from './parser-tranformers';
-import { satisfy } from './elementary-parsers';
+import { satisfy, symbol } from './elementary-parsers';
 import { many, option, seqKeepSecond, sequence } from './parser-combinators';
-import { isDigit, foldl, foldr, snd, fst } from './utils';
+import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty } from './utils';
+import {identity} from "ramda";
 
 /**
  * Parses single digit character to a single integer
@@ -37,23 +38,35 @@ const fract = str => {
   return apply(foldr(f, 0.0), many(digit), str)
 }
 
+// untested
+const integer = str => {
+  return sequence(
+      optionalApply(
+        tuple(v => v, x => v => -v),
+        option(symbol('-'))
+      ),
+      natural,
+      str
+  );
+}
+
 /**
  * Parses string to floating point number
  * @param str - input string
  * @returns {list} - parse results
  */
 const fixed = str => {
-  tuple(xs2, tuple(v1, v2))
-  // There may also be an need for type conversion here, as Haskell has the Num class, 
-  // and in the article the result of integer is converted to this 
-  // Also: not entirely sure the addition of the results are correct
-  return apply(result => fst(snd(result)) + snd(snd(result)), 
-    sequence(integer, optionalApply(
-      tuple(0.0, x => x), option(
-        seqKeepSecond(symbol('.'), fract)
+  return apply(
+    t => snd(fst(t)) + snd(t),
+    sequence(
+      integer,
+      optionalApply(
+        tuple(0.0, identity),
+        option(seqKeepSecond(symbol('.'), fract))
       )
-    ))
-  , str);
+    ),
+    str
+  );
 }
 
 export {

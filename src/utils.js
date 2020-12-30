@@ -345,7 +345,7 @@ const filter = (f, obj) => {
  * @param {array | list | string}list - accumulator values
  * @returns {*} last accumulator value
  */
-const foldl = (f, z, list) => {
+const uncurriedFoldl = (f, z, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
   if (!isArray(list) && !isList(list) && !isString(list))
@@ -357,6 +357,9 @@ const foldl = (f, z, list) => {
   return isEmpty(list) ? z : foldl(f, f(z, x), xs);
 }
 
+/** @see uncurriedFoldl */
+const foldl = curry(uncurriedFoldl);
+
 /**
  * Folds right
  * @param {function} f - operation
@@ -364,7 +367,7 @@ const foldl = (f, z, list) => {
  * @param {array | list | string} list - accumulator values
  * @returns {*} last accumulator value
  */
-const foldr = (f, z, list) => {
+const uncurriedFoldr = (f, z, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
   if (!isArray(list) && !isList(list) && !isString(list))
@@ -375,6 +378,9 @@ const foldr = (f, z, list) => {
 
   return isEmpty(list) ? z : f(x, foldr(f, z, xs));
 }
+
+/** @see uncurriedFoldR */
+const foldr = curry(uncurriedFoldr);
 
 /**
  * Determines whether or not a list has any elements

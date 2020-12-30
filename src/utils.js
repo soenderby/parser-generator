@@ -273,6 +273,9 @@ const map = (f, list) => {
   return R.map(f, list);
 }
 
+/** @see R.max */
+const max = R.max;
+
 /**
  * Applies f to all elements in list and flattens list
  * @param {function:list | *} f
@@ -525,5 +528,6 @@ export {
   recursiveList,
   isString,
   dropWhile,
-  equals
+  equals,
+  max
 }

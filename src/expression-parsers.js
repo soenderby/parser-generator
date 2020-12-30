@@ -10,7 +10,7 @@ import { isDigit } from './utils';
 const digit = (str) => {
   const f = c => c - '0';
 
-  return apply(satisfy(isDigit, str), f);
+  return apply(f, satisfy(isDigit), str);
 }
 
 export {

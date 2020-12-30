@@ -20,8 +20,9 @@ import {
   take,
   tuple,
   recursiveList,
-  fmap, listToArray, listToArrayRecursively
+  fmap, listToArray, listToArrayRecursively, foldl, foldr
 } from '../src/utils';
+import {identity} from "ramda";
 
 describe('Utils', () => {
   /* duck typing */
@@ -179,6 +180,70 @@ describe('Utils', () => {
     it('should return flat list when given function that produces list', () =>{
       const expected = list(2, 4, 6);
       const actual = fmap(e => list(e*2), list(1, 2, 3));
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('foldl', () => {
+    const append = (xs, x) => concat(xs, list(x));
+
+    it ('should return base case for empty string', () => {
+      const expected = 'a';
+      const actual = foldl(append, 'a', '');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return the same string if given string', () => {
+      const expected = 'abc';
+      const actual = foldl(append, '', 'abc');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return base case for empty list', () => {
+      const expected = 1;
+      const actual = foldl(append, 1, list());
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return the same list if given list', () => {
+      const expected = list(1, 2, 3);
+      const actual = foldl(append, list(), list(1, 2, 3));
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('foldr', () => {
+    const prepend = (x, xs) => concat(list(x), xs);
+
+    it ('should return base case for empty string', () => {
+      const expected = 'a';
+      const actual = foldr(list, 'a', '');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return a reversed string if given string', () => {
+      const expected = 'abc';
+      const actual = foldr(prepend, '', 'abc');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return base value for empty list', () => {
+      const expected = 1;
+      const actual = foldr(prepend, 1, list());
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return a reversed list if given list', () => {
+      const expected = list(1, 2, 3);
+      const actual = foldr(prepend, list(), list(1, 2, 3));
 
       assert.deepEqual(actual, expected);
     });

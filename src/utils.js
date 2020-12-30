@@ -339,6 +339,44 @@ const filter = (f, obj) => {
 }
 
 /**
+ * Folds left
+ * @param {function} f - operation
+ * @param {*} z - accumulator start value
+ * @param {array | list | string}list - accumulator values
+ * @returns {*} last accumulator value
+ */
+const foldl = (f, z, list) => {
+  if (!isFunction(f))
+    throw TypeError(`expected f ${f} to be a function`);
+  if (!isArray(list) && !isList(list) && !isString(list))
+    throw TypeError(`expected list ${list} to be a array, list or string`);
+
+  const x = head(list);
+  const xs = tail(list);
+
+  return isEmpty(list) ? z : foldl(f, f(z, x), xs);
+}
+
+/**
+ * Folds right
+ * @param {function} f - operation
+ * @param {*} z - accumulator start value
+ * @param {array | list | string} list - accumulator values
+ * @returns {*} last accumulator value
+ */
+const foldr = (f, z, list) => {
+  if (!isFunction(f))
+    throw TypeError(`expected f ${f} to be a function`);
+  if (!isArray(list) && !isList(list) && !isString(list))
+    throw TypeError(`expected list ${list} to be a array, list or string`);
+
+  const x = head(list);
+  const xs = tail(list);
+
+  return isEmpty(list) ? z : f(x, foldr(f, z, xs));
+}
+
+/**
  * Determines whether or not a list has any elements
  * @param {array| list | string} obj - list of elements
  * @returns {boolean}
@@ -542,5 +580,7 @@ export {
   isString,
   dropWhile,
   equals,
-  max
+  max,
+  foldl,
+  foldr
 }

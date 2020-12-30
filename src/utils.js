@@ -263,6 +263,7 @@ const dropWhile = (f, list) => {
   throw TypeError(`expected list ${list} to be array, string or list`);
 }
 
+const equals = R.equals;
 
 /**
  * Applies f to all elements in list
@@ -536,5 +537,6 @@ export {
   curry,
   recursiveList,
   isString,
-  dropWhile
+  dropWhile,
+  equals
 }

@@ -10,6 +10,7 @@ import {
   isList,
   isNonEmpty,
   isTuple,
+  isDigit,
   list,
   map,
   otherwise,
@@ -23,6 +24,19 @@ import {
 } from '../src/utils';
 
 describe('Utils', () => {
+  /* duck typing */
+  describe('isDigit', () => {
+    it('should recognize all single digits', () => {
+      const actual = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].map(x => isDigit(x));
+
+      assert.isFalse(actual.includes(false))
+    });
+
+    it('should throw error if given more than a single character', () => {
+      assert.throws(() => isDigit('00'));
+    });
+  });
+
   /* Data structures */
   describe('list', () => {
     it('should satisfy isList', () => {

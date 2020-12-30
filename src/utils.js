@@ -507,6 +507,7 @@ export {
   isList,
   isNonEmpty,
   isTuple,
+  isFunction,
   list,
   listToArray,
   listToArrayRecursively,

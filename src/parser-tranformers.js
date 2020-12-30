@@ -1,5 +1,5 @@
 import {curry, compose } from 'ramda';
-import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst } from './utils';
+import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction } from './utils';
 
 /**
  * drops initial spaces from input string, and then applies a
@@ -50,6 +50,26 @@ const uncurriedApply = (f, p, xs) => {
 const apply = curry(uncurriedApply);
 
 /**
+ * Transforms parser output to no or yes(x) depending on whether or not the parser fails
+ * @param {tuple} t - (no, yes) where no is a constant and yes a function
+ * @param {function(string): list} p
+ * @param {string} str
+ * @returns {*}
+ */
+const uncurriedOptionalApply = (t, p, str) => {
+  const no = fst(t);
+  const yes = snd(t);
+  const f = list => isEmpty(list) ? no : yes(head(list));
+
+  if (!isFunction(yes))
+    throw TypeError('expected snd(t) to be function');
+
+  return apply(f, p, str);
+}
+/** @see optionalApply */
+const optionalApply = curry(uncurriedOptionalApply);
+
+/**
  * checks whether or not c is a digit
  * @param {string} c - single character
  * @returns {boolean}
@@ -92,6 +112,7 @@ export {
   sp,
   just,
   apply,
+  optionalApply,
   digit,
   some
 }

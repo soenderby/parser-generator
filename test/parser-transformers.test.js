@@ -1,6 +1,7 @@
 import { assert } from 'chai';
-import { sp, just, apply, some } from '../src/parser-tranformers';
+import {sp, just, apply, some, optionalApply} from '../src/parser-tranformers';
 import { tuple, list } from '../src/utils';
+import {identity} from "ramda";
 
 describe('Parser transformers', () => {
   describe('sp', () => {
@@ -63,7 +64,27 @@ describe('Parser transformers', () => {
     const actual = apply(givenFunction, parser, 'string');
 
     assert.deepEqual(actual, expected);
+   });
   });
+
+  describe('optionalApply', () => {
+    it ('should return no from (no, yes) if parser result is empty', () => {
+      const parser = str => list(tuple('remainder', ''));
+
+      const expected = list(tuple('remainder', 'no'));
+      const actual = optionalApply(tuple('no', identity), parser, '');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return yes(x) from (no, yes) if parser result is non-empty', () => {
+      const parser = str => list(tuple('remainder', 'value'));
+
+      const expected = list(tuple('remainder', 'yes'));
+      const actual = optionalApply(tuple('no', () => 'yes'), parser, '');
+
+      assert.deepEqual(actual, expected);
+    });
   });
 
   describe('some', () => {

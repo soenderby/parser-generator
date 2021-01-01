@@ -6,6 +6,7 @@ import {always, identity, negate} from "ramda";
 
 /**
  * Parses single digit character to a single integer
+ * Example "12" => list(tuple("2", 1))
  * @param str - input string
  * @returns {list} - parse results
  */
@@ -17,6 +18,7 @@ const digit = (str) => {
 
 /**
  * Parses string to integer
+ * Example "123" => list(tuple("", 123), ...)
  * @param str - input string
  * @returns {list} - parse results
  */
@@ -28,8 +30,9 @@ const natural = str => {
 
 /**
  * Parses string to fraction
+ * Example. "123" => list(tuple("", 0.123), ...)
  * @param str - input string
- * @returns {list} - parse results
+ * @returns {list} list of success
  */
 const fract = str => {
   // Not tested, so there may be a need to convert digit to appropriate type 
@@ -39,10 +42,10 @@ const fract = str => {
 }
 
 /**
- * Parses string to an integers
- * Eg. "-123" => [tuple("", -123), ...]
- * @param str
- * @returns {list}
+ * Parses string to integer
+ * Example. "-123" => list(tuple("", -123), ...)
+ * @param {string} str - input string
+ * @returns {list} list of success
  */
 const integer = str => {
   const ap = t => {
@@ -67,6 +70,7 @@ const integer = str => {
 
 /**
  * Parses string to floating point number
+ * Example. "-123.4" => list(tuple("", -123.4), ...)
  * @param str - input string
  * @returns {list} - parse results
  */

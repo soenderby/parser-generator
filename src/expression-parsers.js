@@ -71,8 +71,10 @@ const integer = str => {
  * @returns {list} - parse results
  */
 const fixed = str => {
+  const uncurriedPlus = t => fst(t) + snd(t);
+
   return apply(
-    t => snd(fst(t)) + snd(t),
+    uncurriedPlus,
     sequence(
       integer,
       optionalApply(

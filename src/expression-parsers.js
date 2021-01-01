@@ -30,7 +30,7 @@ const natural = str => {
 
 /**
  * Parses string to fraction
- * Example. "123" => list(tuple("", 0.123), ...)
+ * Example "123" => list(tuple("", 0.123), ...)
  * @param str - input string
  * @returns {list} list of success
  */

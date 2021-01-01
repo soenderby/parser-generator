@@ -1,6 +1,6 @@
 import { assert, expect } from 'chai';
 import { list, tuple, map, head, snd, take } from '../src/utils';
-import { digit, natural, fract, fixed } from '../src/expression-parsers';
+import { digit, natural, fract, fixed, integer } from '../src/expression-parsers';
 import {many} from "../src/parser-combinators";
 
 const firstParseResult= result => snd(head(result));
@@ -31,6 +31,33 @@ describe('Expression Parsers', () => {
     it('should recognize mutiple digits and return result as an integer', () => {
       const expected = 123;
       const actual = firstParseResult(natural('123'));
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('integer', () => {
+    it('should parse a positive integer', () => {
+      const expected = list(
+        tuple('', 123),
+        tuple('3', 12),
+        tuple('23', 1),
+        tuple('123', 0)
+      );
+      const actual = integer('123');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse a negative integer', () => {
+      const expected = list(
+        tuple('', -123),
+        tuple('3', -12),
+        tuple('23', -1),
+        tuple('123', -0),
+        tuple('-123', 0)
+      );
+      const actual = integer('-123');
 
       assert.deepEqual(actual, expected);
     });

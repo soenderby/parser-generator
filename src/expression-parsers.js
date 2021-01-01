@@ -2,7 +2,7 @@ import { apply, optionalApply } from './parser-tranformers';
 import { satisfy, symbol } from './elementary-parsers';
 import { many, option, seqKeepSecond, sequence } from './parser-combinators';
 import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty } from './utils';
-import {identity} from "ramda";
+import {always, identity, negate} from "ramda";
 
 /**
  * Parses single digit character to a single integer
@@ -38,15 +38,30 @@ const fract = str => {
   return apply(foldr(f, 0.0), many(digit), str)
 }
 
-// untested
+/**
+ * Parses string to an integers
+ * Eg. "-123" => [tuple("", -123), ...]
+ * @param str
+ * @returns {list}
+ */
 const integer = str => {
-  return sequence(
+  const ap = t => {
+    const f = fst(t);
+    const x = snd(t);
+
+    return f(x);
+  }
+
+  return apply(
+    ap,
+    sequence(
       optionalApply(
-        tuple(v => v, x => v => -v),
+        tuple(identity, always(negate)),
         option(symbol('-'))
       ),
-      natural,
-      str
+      natural
+    ),
+    str
   );
 }
 
@@ -72,6 +87,7 @@ const fixed = str => {
 export {
   digit,
   natural,
-  fract, 
+  fract,
+  integer,
   fixed
 }

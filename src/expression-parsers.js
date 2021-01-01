@@ -43,7 +43,7 @@ const fract = str => {
 
 /**
  * Parses string to integer
- * Example. "-123" => list(tuple("", -123), ...)
+ * Example "-123" => list(tuple("", -123), ...)
  * @param {string} str - input string
  * @returns {list} list of success
  */
@@ -70,7 +70,7 @@ const integer = str => {
 
 /**
  * Parses string to floating point number
- * Example. "-123.4" => list(tuple("", -123.4), ...)
+ * Example "-123.4" => list(tuple("", -123.4), ...)
  * @param str - input string
  * @returns {list} - parse results
  */

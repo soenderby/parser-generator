@@ -427,6 +427,41 @@ const head = (obj) => {
 }
 
 /**
+ *  Get nth element in a list
+ * @param {number} n - element to get
+ * @param {array | list | string} obj - list of elements
+ * @returns {array | list | string}
+ */
+const nth = (n, obj) => {
+  if (!isNumber(n))
+    throw TypeError(`expected n ${n} to be a number`);
+
+  if (n < 0)
+    throw Error(`expected n ${n} to be positive`);
+
+  if (isArray(obj) || isString(obj))
+    return R.nth(n, obj);
+
+  if (isList(obj)){
+    let iterator = obj();
+    let i = 0;
+
+    while(true) {
+      let iteration = iterator.next();
+
+      if (iteration.done)
+        return undefined;
+
+      if (i === n)
+        return iteration.value;
+
+      i++;
+    }
+  }
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
+}
+
+/**
  * Drops first element in a list
  * @param {array | list | string} obj - list of elements
  * @returns {array | list | string}
@@ -580,6 +615,7 @@ export {
   listToArray,
   listToArrayRecursively,
   map,
+  nth,
   fmap,
   filter,
   otherwise,

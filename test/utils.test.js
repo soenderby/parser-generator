@@ -18,6 +18,7 @@ import {
   listToArray,
   listToArrayRecursively,
   map,
+  nth,
   otherwise,
   piecewise,
   recursiveList,
@@ -330,6 +331,33 @@ describe('Utils', () => {
 
       it('should return false if given empty string', () => {
         assert.isFalse(isNonEmpty(''));
+      });
+    });
+
+    describe('nth', () => {
+      it ('should return undefined for out-of-bounds index', () => {
+        assert.isUndefined(nth(2, list(1, 2)));
+      });
+
+      it ('should return nth element in array', () => {
+        const expected = 3;
+        const actual = nth(2, [1, 2, 3]);
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it ('should return nth element in list', () => {
+        const expected = 3;
+        const actual = nth(2, list(1, 2, 3));
+
+        assert.deepEqual(actual, expected);
+      });
+
+      it ('should return nth character in string', () => {
+        const expected = 'c';
+        const actual = nth(2, 'abc');
+
+        assert.deepEqual(actual, expected);
       });
     });
 

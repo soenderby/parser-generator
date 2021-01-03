@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
-import { fail, symbol } from '../src/elementary-parsers';
+import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, many1, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
+import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
   tuple,
   piecewise,

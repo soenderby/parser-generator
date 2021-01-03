@@ -1,6 +1,8 @@
 import { assert } from 'chai';
-import {sp, just, apply, some, optionalApply} from '../src/parser-tranformers';
-import { tuple, list } from '../src/utils';
+import {sp, just, apply, some, optionalApply, first} from '../src/parser-tranformers';
+import { list, tuple } from '../src/utils';
+import { symbol } from '../src/elementary-parsers';
+import { many } from '../src/parser-combinators';
 import {identity} from "ramda";
 
 describe('Parser transformers', () => {
@@ -106,6 +108,22 @@ describe('Parser transformers', () => {
 
       const expected = 'result2';
       const actual = some(parser, 'string');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('first', () => {
+    it('should return empty list if given parser has no results', () => {
+      const expected = list();
+      const actual = first(symbol('a'), 'string');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return the first result if a parser is successful', () => {
+      const expected = list(tuple('', 'aa'));
+      const actual = first(many(symbol('a')), 'aa');
 
       assert.deepEqual(actual, expected);
     });

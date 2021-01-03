@@ -1,5 +1,5 @@
 import {curry, compose } from 'ramda';
-import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction, equals } from './utils';
+import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction, equals, list } from './utils';
 
 /**
  * drops initial spaces from input string, and then applies a
@@ -85,10 +85,30 @@ const uncurriedSome = (p, str) => {
 /** @see uncurriedSome */
 const some = curry(uncurriedSome);
 
+/**
+ * Yields the first possible result of a parser, or an empty list
+ * 
+ * @param {function(string): list} p - parser to transform
+ * @param {string} str - input string
+ * @returns {list} parser result
+ */
+const uncurriedFirst = (p, str) => {
+  const r = p(str);
+
+  return isEmpty(r) ? list()
+                      : list(head(r));
+}
+
+/**
+ * @see uncurriedFirst
+ */
+const first = curry(uncurriedFirst);
+
 export {
   sp,
   just,
   apply,
   optionalApply,
-  some
+  some,
+  first
 }

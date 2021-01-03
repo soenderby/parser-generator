@@ -97,11 +97,26 @@ const fixed = str => {
   );
 }
 
+const float = str => {
+  const power = e => e < 0 ? 1.0 / power(-e) : Math.pow(10, e);
+  const f = (m,e) => m * power(e);
+
+  return apply(
+    t => f(fst(t), snd(t)),
+    sequence(
+      fixed,
+      optionalApply(tuple(0.0, identity), option(seqKeepSecond(symbol('E'), integer)))
+    ),
+    str
+  );
+}
+
 export {
   identifier,
   digit,
   natural,
   fract,
   integer,
-  fixed
+  fixed,
+  float
 }

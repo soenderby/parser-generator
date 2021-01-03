@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
-import { fail, symbol } from '../src/elementary-parsers';
+import { fail, satisfy, symbol } from '../src/elementary-parsers';
 import {
   tuple,
   piecewise,
@@ -13,8 +13,10 @@ import {
   emptyList,
   take,
   drop,
-  curry
+  curry,
+  isDigit
 } from '../src/utils';
+import { digit } from '../src/expression-parsers';
 
 const parseA = str => (head(str) === 'a') ? list(tuple(tail(str), 'a')) : list();
 
@@ -230,18 +232,37 @@ describe('Parser combinators', () => {
 
   describe('chainLeft', () => {
     it('should apply parser for item and separator from left to right', () => {
-      const inputString = '1+1+1 rest';
+      const inputString = '1+2+3 rest';
 
-      const separatorParser = str => list(tuple(drop(1, str), e1 => e2 => `(${e1}+${e2})`));
+      const separatorParser = str => list(tuple(drop(1, str), (e1, e2) => `(${e1}+${e2})`));
 
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
       const expected = list(
-        tuple(' rest', '((1+1)+1)'),
-        tuple('+1 rest', '(1+1)'),
-        tuple('+1+1 rest', '1')
+        tuple(' rest', '((1+2)+3)'),
+        tuple('+3 rest', '(1+2)'),
+        tuple('+2+3 rest', '1')
       );
-      const actual = chainLeft(symbol('1'), separatorParser, inputString);
+      const actual = chainLeft(satisfy(isDigit), separatorParser, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('chainRight', () => {
+    it('should apply parser for item and separator from right to left', () => {
+      const inputString = '1+2+3 rest';
+
+      const separatorParser = str => list(tuple(drop(1, str), (e1, e2) => `(${e1}+${e2})`));
+
+      // The parser for the separator should return a function that combines parse trees
+      // So it should define an operation and not a token
+      const expected = list(
+        tuple(' rest', '(2+(3+1))'),
+        tuple('+3 rest', '(2+1)'),
+        tuple('+2+3 rest', '1')
+      );
+      const actual = chainRight(satisfy(isDigit), separatorParser, inputString);
 
       assert.deepEqual(actual, expected);
     });

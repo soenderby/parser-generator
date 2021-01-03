@@ -10,6 +10,8 @@ import {
     list,
     concat,
     fmap,
+    foldl,
+    foldr,
     recursiveList,
     piecewise,
     isEmpty,
@@ -194,12 +196,57 @@ const listOf = curry(uncurriedListOf);
  * [Unfinished]
  * SeparatorParser should be accept a string and return a function that combines parse trees
  * according to the operation it describes
+ * 
+ * Parses list of items applies operation, defined by the separator, from left to right
+ * @param {function(string): list} p - item parser
+ * @param {function(string): list} s - separator parser, this should yield a function
+ * @param {string} str - input string
+ * @returns {list} parser results
  */
-const uncurriedChainLeft = (p, s, string) => {
-  return apply()(sequence(p, many(sequence(s, p)), string));
+const uncurriedChainLeft = (p, s, str) => {
+  const flippedApplyTwo = (x, tuple) => {
+    const op = fst(tuple);
+    const y = snd(tuple);
+
+    return op(x, y);
+  };
+  
+  return apply(
+    t => foldl(flippedApplyTwo, fst(t), snd(t)), 
+    sequence(p, many(sequence(s, p))),
+    str
+  );
 }
-/** see uncurriedChainLeft */
+/** @see uncurriedChainLeft */
 const chainLeft = curry(uncurriedChainLeft);
+
+/**
+ * Parses list of items applies operation, defined by the separator, from right to left
+ * 
+ * @param {function(string): list} p - item parser
+ * @param {function(string): list} s - separator parser, this should return a function
+ * @param {string} str
+ * @returns {list} parser results
+ */
+const uncurriedChainRight = (p, s, str) => {
+  const applyOne = (tuple, y) => {
+    const x = snd(tuple);
+    const op = fst(tuple);
+
+    return op(x, y);
+  };
+
+  return apply(
+    t => foldr(applyOne, fst(t), snd(t)),//foldr(applyOne, snd(t), fst(t)), 
+    sequence(p, many(sequence(s, p))),
+    str
+  );
+};
+
+/**
+ * @see uncurriedChainRight
+ */
+const chainRight = curry(uncurriedChainRight);
 
 export {
   sequence,
@@ -210,5 +257,6 @@ export {
   option,
   pack,
   listOf,
-  chainLeft
+  chainLeft,
+  chainRight
 }

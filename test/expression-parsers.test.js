@@ -282,5 +282,16 @@ describe('Expression Parsers', () => {
 
       assert.deepEqual(actual, expected);
     });
+
+    it('should parse \'a+b/c\' to addition', () => {
+      const expected = list(
+        tuple('', addition(variable('a'), division(variable('b'), variable('c')))),
+        tuple('/c', addition(variable('a'), variable('b'))),
+        tuple('+b/c', variable('a'))
+      );
+      const actual = expr('a+b/c');
+
+      assert.deepEqual(actual, expected);
+    });
   });
 });

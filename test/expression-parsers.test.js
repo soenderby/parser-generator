@@ -216,7 +216,7 @@ describe('Expression Parsers', () => {
         tuple('c', variable('ab')),
         tuple('bc', variable('a')),
       );
-      const actual = drop(1, fact('abc'));
+      const actual = fact('abc');
 
       assert.deepEqual(actual, expected);
     });

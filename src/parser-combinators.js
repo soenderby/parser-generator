@@ -288,13 +288,48 @@ const chainRight = curry(uncurriedChainRight);
  * Applies a parser again and again until it fails, and returns the final result
  * @param {function(string): list} p - parser
  * @param {string} str - input string
- * @returns {list} - parse result
+ * @returns {list} - parser results
  */
 const uncurriedGreedy = (p, str) => {
   return first(many(p), str);
 }
 
+/**
+ * @see uncurriedGreedy
+ */
 const greedy = curry(uncurriedGreedy);
+
+/**
+ * Applies a parser again and again until it fails, and returns the final result (expects at least one parse)
+ * 
+ * @param {function(string): list} p - parser
+ * @param {*} str 
+ * @returns {list} - parser results
+ */
+const uncurriedGreedy1 = (p, str) => {
+  return first(many1(p), str);
+};
+
+/**
+ * @see uncurriedGreedy1
+ */
+const greedy1 = curry(uncurriedGreedy1);
+
+/**
+ * Accepts a construct if it is present, but does not fail if it is not
+ * 
+ * @param {function(string): list} p - parser for construct
+ * @param {*} str - input string
+ * @returns {list} - parser results
+ */
+const uncurriedCompulsion = (p, str) => {
+  return first(option(p), str);
+};
+
+/**
+ * @see uncurriedCompulsion
+ */
+const compulsion = curry(uncurriedCompulsion);
 
 export {
   sequence,
@@ -312,6 +347,8 @@ export {
   chainLeft,
   chainRight,
   greedy,
+  greedy1,
+  compulsion,
   commaList,
   semicList
 }

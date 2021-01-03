@@ -13,8 +13,10 @@ import {
   chainRight,
   parenthesized,
   bracketed,
-  compound,
   greedy,
+  greedy1,
+  compulsion,
+  compound,
   commaList,
   semicList
 } from '../src/parser-combinators';
@@ -457,4 +459,53 @@ describe('Parser combinators', () => {
       assert.deepEqual(actual, expected);
     });
   });
+
+  describe('greedy', () => {
+    it('should return empty result if parser always fails', () => {
+      const expected = list(tuple('b', ''));
+      const actual = greedy(symbol('a'), 'b');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return the result containing all the results of the given parser', () => {
+      const expected = list(tuple('b', 'aaa'));
+      const actual = greedy(symbol('a'), 'aaab');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('greedy1', () => {
+    it('should return empty list if parser fails first time', () => {
+      const expected = list();
+      const actual = greedy1(symbol('a'), 'b');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return the result containing all the results of the given parser', () => {
+      const expected = list(tuple('b', 'aaa'));
+      const actual = greedy1(symbol('a'), 'aaab');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('compulsion', () => {
+    it('should not fail if the construct is not present', () => {
+      const expected = list(tuple('string', ''));
+      const actual = compulsion(symbol('a'), 'string');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should accept the construct if it is present', () => {
+      const expected = list(tuple('string', 'a'));
+      const actual = compulsion(symbol('a'), 'astring');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
 });

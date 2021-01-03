@@ -275,6 +275,7 @@ export {
   pack,
   parenthesized,
   bracketed,
+  compound,
   listOf,
   chainLeft,
   chainRight

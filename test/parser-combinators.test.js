@@ -12,7 +12,8 @@ import {
   chainLeft,
   chainRight,
   parenthesized,
-  bracketed
+  bracketed,
+  compound
 } from '../src/parser-combinators';
 import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
@@ -340,6 +341,38 @@ describe('Parser combinators', () => {
       assert.deepEqual(actual, expected);
     });
   });
+
+  describe('compound', () => {
+    const parseTrimmedToken = token => str => list(tuple(drop(token.length, str.trim()), take(token.length, str.trim())));
+
+    it ('should not parse a section if missing start delimiter', () => {
+      const inputString = ' pack end';
+
+      const expected = list();
+      const actual = compound(parseTrimmedToken('pack'), inputString);
+
+      assert.deepEqual(actual, expected);
+    })
+
+    it('should parse a section that is between a start and end delimiter', () => {
+      const inputString = 'begin pack end';
+
+      const expected = list(tuple( '', 'pack' ));
+      const actual = compound(parseTrimmedToken('pack'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse a section that is between a start and end delimiter, and return remainder', () => {
+      const inputString = 'begin pack end remainder';
+
+      const expected = list(tuple( ' remainder', 'pack' ));
+      const actual = compound(parseTrimmedToken('pack'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
 
   describe('listOf', () => {
     it('should parse an empty list', () => {

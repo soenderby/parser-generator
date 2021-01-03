@@ -12,11 +12,45 @@ const firstParseResult= result => snd(head(result));
 describe('Expression Parsers', () => {
   /* number parsers */
   describe('digit', () => {
-    it('should recognize a digit characters and return the result as an integer', () => {
-      const expected = list(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-      const actual = map(x => firstParseResult(digit(x)), list('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
 
-      assert.deepEqual(actual, expected);
+    it('should recognize 0', () => {
+      assert.deepEqual(digit('0'), list(tuple('', 0)));
+    });
+
+    it('should recognize 1', () => {
+      assert.deepEqual(digit('1'), list(tuple('', 1)));
+    });
+
+    it('should recognize 2', () => {
+      assert.deepEqual(digit('2'), list(tuple('', 2)));
+    });
+
+    it('should recognize 3', () => {
+      assert.deepEqual(digit('3'), list(tuple('', 3)));
+    });
+
+    it('should recognize 4', () => {
+      assert.deepEqual(digit('4'), list(tuple('', 4)));
+    });
+    
+    it('should recognize 5', () => {
+      assert.deepEqual(digit('5'), list(tuple('', 5)));
+    });
+
+    it('should recognize 6', () => {
+      assert.deepEqual(digit('6'), list(tuple('', 6)));
+    });
+
+    it('should recognize 7', () => {
+      assert.deepEqual(digit('7'), list(tuple('', 7)));
+    });
+
+    it('should recognize 8', () => {
+      assert.deepEqual(digit('8'), list(tuple('', 8)));
+    });
+
+    it('should recognize 9', () => {
+      assert.deepEqual(digit('9'), list(tuple('', 9)));
     });
 
     it('should recognize a repeated digit characters if combined with many', () => {

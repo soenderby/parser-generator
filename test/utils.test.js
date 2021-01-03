@@ -247,7 +247,7 @@ describe('Utils', () => {
       });
 
       it('should be able to unparsed sum a list of numbers', () => {
-        const expected = '3 + 2 + 1 + 0';
+        const expected = '1 + 2 + 3 + 0';
         const actual = foldr((a, b) =>  `${a} + ${b}`, 0, list(1, 2, 3));
 
         assert.deepEqual(actual, expected);

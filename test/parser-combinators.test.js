@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
+import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, many1, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
 import { fail, symbol } from '../src/elementary-parsers';
 import {
   tuple,
@@ -155,6 +155,35 @@ describe('Parser combinators', () => {
 
       const expected = list(tuple('baa', 'a'), tuple('abaa', ''));
       const actual = many(parseA, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('many1', () => {
+    it('should apply a given parser multiple times if successful', () => {
+      const inputString = 'aaab';
+
+      const expected = list(tuple('b', 'aaa'), tuple('ab', 'aa'), tuple('aab', 'a'));
+      const actual = many1(parseA, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return empty list if it fails the first time', () => {
+      const inputString = 'baa';
+
+      const expected = list();
+      const actual = many1(parseA, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should apply a given parser multiple times until it fails', () => {
+      const inputString = 'abaa';
+
+      const expected = list(tuple('baa', 'a'));
+      const actual = many1(parseA, inputString);
 
       assert.deepEqual(actual, expected);
     });

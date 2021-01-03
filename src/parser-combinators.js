@@ -107,6 +107,22 @@ const uncurriedMany = (p, str) => {
 const many = curry(uncurriedMany);
 
 /**
+ * Applies a parser again and again until it fails (expects at least one parse)
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedMany1 = (p, str) => {
+  return apply(
+    t => concat(list(fst(t)), snd(t)),
+    sequence(p, many(p)),
+    str
+  );
+};
+/** @see uncurriedMany1 */
+const many1 = curry(uncurriedMany1);
+
+/**
  * Returns a list with zero or one element, depending on whether p is satisfied
  * @param {function(string): list} p - parser
  * @param {string} str - input string
@@ -207,6 +223,7 @@ export {
   seqKeepFirst,
   seqKeepSecond,
   many,
+  many1,
   option,
   pack,
   listOf,

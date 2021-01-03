@@ -1,6 +1,16 @@
 import { apply, optionalApply } from './parser-tranformers';
 import { satisfy, symbol } from './elementary-parsers';
-import { many, many1, option, seqKeepSecond, sequence } from './parser-combinators';
+import {
+  alternation,
+  chainRight,
+  commaList,
+  many,
+  many1,
+  option,
+  parenthesized,
+  seqKeepSecond,
+  sequence
+} from './parser-combinators';
 import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty, isAlpha, isString, curry } from './utils';
 import {always, identity, negate} from "ramda";
 
@@ -153,6 +163,73 @@ const subtraction = binaryOperation('subtraction');
 const multiplication = binaryOperation('multiplication');
 const division = binaryOperation('division');
 
+const fact = str => {
+  const ap = t => {
+    const x = fst(t);
+    const f = snd(t);
+    return f(x);
+  };
+  const flippedCallOperation = (args, name) => callOperation(name, args);
+
+  return alternation(
+    alternation(
+      apply(constant, integer),
+      apply(
+        ap,
+        sequence(
+         identifier,
+         optionalApply(
+           tuple(variable, flippedCallOperation),
+           option(parenthesized(commaList(expr)))
+         )
+        )
+      )
+    ),
+    parenthesized(expr),
+    str
+  );
+  /*
+  return alternation(
+      apply(constant, integer),
+      alternation(
+      apply(
+        ap,
+        sequence(
+          identifier,
+          optionalApply(
+            tuple(variable, flippedCallOperation),
+            option(parenthesized(commaList(expr)))
+          )
+        ),
+      ),
+       parenthesized(expr)
+      ),
+      str
+  );*/
+}
+
+const term = str => {
+  chainRight(
+    fact,
+    alternation(
+      apply(symbol('+'), always(addition)),
+      apply(symbol('-'), always(subtraction))
+    ),
+    str
+  );
+}
+
+const expr = str => {
+  return chainRight(
+    term,
+    alternation(
+      apply(symbol('*'), always(multiplication)),
+      apply(symbol('/'), always(division))
+    ),
+    str
+  );
+}
+
 export {
   identifier,
   digit,
@@ -168,5 +245,8 @@ export {
   subtraction,
   multiplication,
   division,
-  constant
+  constant,
+  fact,
+  term,
+  expr
 }

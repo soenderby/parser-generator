@@ -1,7 +1,23 @@
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
-import { list, tuple, map, head, snd, take, nth } from '../src/utils';
-import {digit, natural, fract, fixed, integer, identifier, float} from '../src/expression-parsers';
+import { list, tuple, map, head, snd, take, nth, drop } from '../src/utils';
+import {
+  digit,
+  natural,
+  fract,
+  fixed,
+  integer,
+  identifier,
+  float,
+  fact,
+  constant,
+  variable,
+  callOperation,
+  addition,
+  subtraction,
+  multiplication,
+  division
+} from '../src/expression-parsers';
 import {many} from "../src/parser-combinators";
 
 const chaiAlmost = require('chai-almost');
@@ -179,6 +195,88 @@ describe('Expression Parsers', () => {
       expect(nth(2, actual)).to.deep.almost(nth(2, expected), 0.01);
       expect(nth(3, actual)).to.deep.almost(nth(3, expected), 0.01);
       expect(nth(4, actual)).to.deep.almost(nth(4, expected), 0.01);
+    });
+  });
+
+  describe('fact', () => {
+    it('should parse \'123\' to constant', () => {
+      const expected = list(
+        tuple('', constant(123)),
+        tuple('3', constant(12)),
+        tuple('23', constant(1))
+      );
+      const actual = take(3, fact('123'));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'abc\' to variables', () => {
+      const expected = list(
+        tuple('', variable('abc')),
+        tuple('c', variable('ab')),
+        tuple('bc', variable('a')),
+      );
+      const actual = drop(1, fact('abc'));
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'f(a,b)\' to callOperation', () => {
+      const expected = list(
+        tuple('', callOperation('f', list(variable('a'), variable('b'))))
+      );
+      const actual = fact('f(a,b)');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'(a)\' to callOperation', () => {
+      const expected = list(
+        tuple('', variable('a'))
+      );
+      const actual = fact('(a)');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('term', () => {
+    it('should parse \'a*b\' to addition', () => {
+      const expected = list(
+        tuple('', multiplication(variable('a'), variable('b'))),
+      );
+      const actual = fact('a*b');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'a/b\' to addition', () => {
+      const expected = list(
+        tuple('', division(variable('a'), variable('b'))),
+      );
+      const actual = fact('a/b');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('expr', () => {
+    it('should parse \'a+b\' to addition', () => {
+      const expected = list(
+        tuple('', addition(variable('a'), variable('b'))),
+      );
+      const actual = fact('a+b');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'a-b\' to addition', () => {
+      const expected = list(
+        tuple('', subtraction(variable('a'), variable('b'))),
+      );
+      const actual = fact('a-b');
+
+      assert.deepEqual(actual, expected);
     });
   });
 });

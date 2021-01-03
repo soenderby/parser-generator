@@ -59,7 +59,7 @@ const apply = curry(uncurriedApply);
 const uncurriedOptionalApply = (t, p, str) => {
   const no = fst(t);
   const yes = snd(t);
-  const f = list => isEmpty(list) ? no : yes(head(list));
+  const f = list => isEmpty(list) ? no : yes(list);
 
   if (!isFunction(yes))
     throw TypeError('expected snd(t) to be function');

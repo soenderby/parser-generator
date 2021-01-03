@@ -2,7 +2,7 @@ import { apply, optionalApply } from './parser-tranformers';
 import { satisfy, symbol } from './elementary-parsers';
 import {
   alternation,
-  chainRight,
+  chainRight, choice,
   commaList,
   many,
   many1,
@@ -11,8 +11,25 @@ import {
   seqKeepSecond,
   sequence
 } from './parser-combinators';
-import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty, isAlpha, isString, curry } from './utils';
-import {always, identity, negate} from "ramda";
+import {
+  isDigit,
+  foldl,
+  foldr,
+  snd,
+  fst,
+  tuple,
+  isEmpty,
+  isAlpha,
+  isString,
+  curry,
+  drop,
+  take,
+  list,
+  isList,
+  head,
+  map
+} from './utils';
+import {always, flip, identity, negate} from "ramda";
 
 /**
  * Parses string to word (containing only alphabetical charachters)
@@ -169,66 +186,52 @@ const fact = str => {
     const f = snd(t);
     return f(x);
   };
-  const flippedCallOperation = t => callOperation(snd(t), fst(t));
+  const flippedCallOperation = args => {
+    if (!isList(args))
+      throw TypeError('expected args to be list');
+
+    return name => callOperation(name, head(args));
+  }
+
+  const temp = str => list(tuple(drop(1, str), variable(take(1, str))));
 
   return alternation(
     alternation(
       apply(constant, integer),
-      apply(
-        ap,
-        sequence(
-         identifier,
-         optionalApply(
-           tuple(variable, always(flippedCallOperation)),
-           option(parenthesized(commaList(expr)))
-         )
-        )
-      )
-    ),
-    parenthesized(expr),
-    str
-  );
-  /*
-  return alternation(
-      apply(constant, integer),
-      alternation(
       apply(
         ap,
         sequence(
           identifier,
           optionalApply(
             tuple(variable, flippedCallOperation),
-            option(parenthesized(commaList(expr)))
+            option(parenthesized(commaList(temp)))
           )
-        ),
-      ),
-       parenthesized(expr)
-      ),
-      str
-  );*/
-}
-
-const term = str => {
-  chainRight(
-    fact,
-    alternation(
-      apply(symbol('+'), always(addition)),
-      apply(symbol('-'), always(subtraction))
+        )
+      )
     ),
+    parenthesized(temp),
     str
   );
 }
 
-const expr = str => {
-  return chainRight(
-    term,
-    alternation(
-      apply(symbol('*'), always(multiplication)),
-      apply(symbol('/'), always(division))
-    ),
-    str
-  );
-}
+const uncurriedGen = (ops, p, str) => {
+  const f = t => apply(always(snd(t)), symbol(fst(t)));
+
+  return chainRight(p, choice(map(f, ops)), str)
+};
+const gen = curry(uncurriedGen);
+
+const multis = list(
+  tuple('*', flip(multiplication)),
+  tuple('/', flip(division)),
+);
+
+const addis = list(
+  tuple('+', flip(addition)),
+  tuple('-', flip(subtraction)),
+);
+
+const expr = gen(addis, gen(multis, fact));
 
 export {
   identifier,
@@ -247,6 +250,5 @@ export {
   division,
   constant,
   fact,
-  term,
   expr
 }

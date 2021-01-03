@@ -351,7 +351,7 @@ describe('Parser combinators', () => {
     it('should parse an empty list', () => {
       const inputString = 'post list';
 
-      const expected = list(tuple('post list', ''));
+      const expected = list(tuple('post list', list()));
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
       assert.deepEqual(actual, expected);
@@ -361,10 +361,10 @@ describe('Parser combinators', () => {
       const inputString = 'a,a,a,post list';
 
       const expected = list(
-        tuple(',post list', 'aaa'),
-        tuple(',a,post list', 'aa'),
-        tuple(',a,a,post list', 'a'),
-        tuple('a,a,a,post list', '')
+        tuple(',post list', list('a','a','a')),
+        tuple(',a,post list', list('a','a')),
+        tuple(',a,a,post list', list('a')),
+        tuple('a,a,a,post list', list())
       );
       const actual = listOf(symbol('a'), symbol(','), inputString);
 
@@ -372,11 +372,11 @@ describe('Parser combinators', () => {
     });
   });
 
-  describe('commmaList', () => {
+  describe('commaList', () => {
     it('should parse an empty list', () => {
       const inputString = 'post list';
 
-      const expected = list(tuple('post list', ''));
+      const expected = list(tuple('post list', list()));
       const actual = commaList(symbol('a'), inputString);
 
       assert.deepEqual(actual, expected);
@@ -386,10 +386,10 @@ describe('Parser combinators', () => {
       const inputString = 'a,a,a,post list';
 
       const expected = list(
-        tuple(',post list', 'aaa'),
-        tuple(',a,post list', 'aa'),
-        tuple(',a,a,post list', 'a'),
-        tuple('a,a,a,post list', '')
+        tuple(',post list', list('a','a','a')),
+        tuple(',a,post list', list('a','a')),
+        tuple(',a,a,post list', list('a')),
+        tuple('a,a,a,post list', list())
       );
       const actual = commaList(symbol('a'), inputString);
 
@@ -401,7 +401,7 @@ describe('Parser combinators', () => {
     it('should parse an empty list', () => {
       const inputString = 'post list';
 
-      const expected = list(tuple('post list', ''));
+      const expected = list(tuple('post list', list()));
       const actual = semicList(symbol('a'), inputString);
 
       assert.deepEqual(actual, expected);
@@ -411,10 +411,10 @@ describe('Parser combinators', () => {
       const inputString = 'a;a;a;post list';
 
       const expected = list(
-        tuple(';post list', 'aaa'),
-        tuple(';a;post list', 'aa'),
-        tuple(';a;a;post list', 'a'),
-        tuple('a;a;a;post list', '')
+        tuple(';post list', list('a','a','a')),
+        tuple(';a;post list', list('a','a')),
+        tuple(';a;a;post list', list('a')),
+        tuple('a;a;a;post list', list())
       );
       const actual = semicList(symbol('a'), inputString);
 

@@ -16,7 +16,8 @@ import {
   addition,
   subtraction,
   multiplication,
-  division
+  division,
+  expr
 } from '../src/expression-parsers';
 import {many} from "../src/parser-combinators";
 
@@ -223,14 +224,15 @@ describe('Expression Parsers', () => {
 
     it('should parse \'f(a,b)\' to callOperation', () => {
       const expected = list(
-        tuple('', callOperation('f', list(variable('a'), variable('b'))))
+        tuple('', callOperation('f', list(variable('a'), variable('b')))),
+        tuple('(a,b)', variable('f'))
       );
       const actual = fact('f(a,b)');
 
       assert.deepEqual(actual, expected);
     });
 
-    it('should parse \'(a)\' to callOperation', () => {
+    it('should parse \'(a)\' to variable', () => {
       const expected = list(
         tuple('', variable('a'))
       );
@@ -240,12 +242,13 @@ describe('Expression Parsers', () => {
     });
   });
 
-  describe('term', () => {
+  describe('expr', () => {
     it('should parse \'a*b\' to addition', () => {
       const expected = list(
         tuple('', multiplication(variable('a'), variable('b'))),
+        tuple('*b', variable('a'))
       );
-      const actual = fact('a*b');
+      const actual = expr('a*b');
 
       assert.deepEqual(actual, expected);
     });
@@ -253,19 +256,19 @@ describe('Expression Parsers', () => {
     it('should parse \'a/b\' to addition', () => {
       const expected = list(
         tuple('', division(variable('a'), variable('b'))),
+        tuple('/b', variable('a'))
       );
-      const actual = fact('a/b');
+      const actual = expr('a/b');
 
       assert.deepEqual(actual, expected);
     });
-  });
 
-  describe('expr', () => {
     it('should parse \'a+b\' to addition', () => {
       const expected = list(
         tuple('', addition(variable('a'), variable('b'))),
+        tuple('+b', variable('a'))
       );
-      const actual = fact('a+b');
+      const actual = expr('a+b');
 
       assert.deepEqual(actual, expected);
     });
@@ -273,8 +276,9 @@ describe('Expression Parsers', () => {
     it('should parse \'a-b\' to addition', () => {
       const expected = list(
         tuple('', subtraction(variable('a'), variable('b'))),
+        tuple('-b', variable('a'))
       );
-      const actual = fact('a-b');
+      const actual = expr('a-b');
 
       assert.deepEqual(actual, expected);
     });

@@ -1,4 +1,4 @@
-import { epsilon, succeed, symbol } from './elementary-parsers';
+import { epsilon, succeed, symbol, fail } from './elementary-parsers';
 import { apply, first } from './parser-tranformers';
 import { curry, chain } from 'ramda';
 import {
@@ -125,6 +125,14 @@ const uncurriedMany1 = (p, str) => {
 const many1 = curry(uncurriedMany1);
 
 /**
+ * A combinator choice that iterates the operator <|>
+ * @param listOfParsers
+ */
+const choice = (listOfParsers) => {
+  return foldr(alternation, fail, listOfParsers);
+}
+
+/**
  * Returns a list with zero or one element, depending on whether p is satisfied
  * @param {function(string): list} p - parser
  * @param {string} str - input string
@@ -198,10 +206,10 @@ const compound = curry(uncurriedCompound);
 const uncurriedListOf = (p, s, str) => {
   return alternation (
     apply(
-      t => list(fst(t), snd(t)),
+      t => concat(list(fst(t)), snd(t)),
       sequence(p, many(seqKeepSecond(s, p)))
     ),
-    succeed(emptyList(str)),
+    succeed(list()),
     str
   );
 }
@@ -350,5 +358,6 @@ export {
   greedy1,
   compulsion,
   commaList,
-  semicList
+  semicList,
+  choice
 }

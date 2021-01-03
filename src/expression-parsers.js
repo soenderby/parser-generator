@@ -42,7 +42,7 @@ const digit = (str) => {
 const natural = str => {
   const f = (prevValue, digit) => prevValue * 10 + digit;
 
-  return apply(foldl(f, 0), many(digit), str);
+  return apply(foldl(f, 0), many1(digit), str);
 }
 
 /**

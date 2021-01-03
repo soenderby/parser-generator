@@ -111,6 +111,22 @@ const float = str => {
   );
 }
 
+const variable = name => {
+  return {
+    operation: 'variable',
+    name: name
+  }
+}
+
+const uncurriedCallOperation = (name, args) => {
+  return {
+    operation: 'function',
+    name: name,
+    arguments: args
+  }
+}
+const callOperation = curry(uncurriedCallOperation);
+
 const uncurriedBinaryOperation = (operation, left, right) => {
   if(!isString(operation))
     throw new TypeError('expected operation to be string');
@@ -139,6 +155,8 @@ export {
   fixed,
   float,
   binaryOperation,
+  variable,
+  callOperation,
   addition,
   subtraction,
   multiplication,

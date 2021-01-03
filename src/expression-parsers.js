@@ -118,6 +118,13 @@ const variable = name => {
   }
 }
 
+const constant = value => {
+  return {
+    operation: 'constant',
+    value: value
+  }
+}
+
 const uncurriedCallOperation = (name, args) => {
   return {
     operation: 'function',
@@ -160,5 +167,6 @@ export {
   addition,
   subtraction,
   multiplication,
-  division
+  division,
+  constant
 }

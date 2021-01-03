@@ -14,7 +14,9 @@ import {
   parenthesized,
   bracketed,
   compound,
-  greedy
+  greedy,
+  commaList,
+  semicList
 } from '../src/parser-combinators';
 import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
@@ -363,6 +365,56 @@ describe('Parser combinators', () => {
         tuple('a,a,a,post list', '')
       );
       const actual = listOf(symbol('a'), symbol(','), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('commmaList', () => {
+    it('should parse an empty list', () => {
+      const inputString = 'post list';
+
+      const expected = list(tuple('post list', ''));
+      const actual = commaList(symbol('a'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse a non-empty list given parser for the items', () => {
+      const inputString = 'a,a,a,post list';
+
+      const expected = list(
+        tuple(',post list', 'aaa'),
+        tuple(',a,post list', 'aa'),
+        tuple(',a,a,post list', 'a'),
+        tuple('a,a,a,post list', '')
+      );
+      const actual = commaList(symbol('a'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('semicList', () => {
+    it('should parse an empty list', () => {
+      const inputString = 'post list';
+
+      const expected = list(tuple('post list', ''));
+      const actual = semicList(symbol('a'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse a non-empty list given parser for the items', () => {
+      const inputString = 'a;a;a;post list';
+
+      const expected = list(
+        tuple(';post list', 'aaa'),
+        tuple(';a;post list', 'aa'),
+        tuple(';a;a;post list', 'a'),
+        tuple('a;a;a;post list', '')
+      );
+      const actual = semicList(symbol('a'), inputString);
 
       assert.deepEqual(actual, expected);
     });

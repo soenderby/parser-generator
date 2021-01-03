@@ -209,6 +209,26 @@ const uncurriedListOf = (p, s, str) => {
 const listOf = curry(uncurriedListOf);
 
 /**
+ * Parses symbols between consecutive ','
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedCommaList= (p, str) => listOf(p, symbol(','), str);
+/** @see compound */
+const commaList = curry(uncurriedCommaList);
+
+/**
+ * Parses symbols between consecutive ';'
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} parser results
+ */
+const uncurriedSemicList= (p, str) => listOf(p, symbol(';'), str);
+/** @see compound */
+const semicList = curry(uncurriedSemicList);
+
+/**
  * [Unfinished]
  * SeparatorParser should be accept a string and return a function that combines parse trees
  * according to the operation it describes
@@ -291,5 +311,7 @@ export {
   listOf,
   chainLeft,
   chainRight,
-  greedy
+  greedy,
+  commaList,
+  semicList
 }

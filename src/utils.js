@@ -98,6 +98,21 @@ const isFunction = obj => typeof obj === 'function';
 const isNumber = obj => typeof obj === 'number';
 
 /**
+ * checks whether or not c is a alphabetical character
+ * @param {string} c - single character
+ * @returns {boolean}
+ */
+const isAlpha = c => {
+  if (!isString(c))
+    throw new Error('expects c to be string');
+
+  if (c.length !== 1)
+    throw new Error('expects only a single character');
+
+    return Boolean(c.match(/[a-zA-Z]/i));
+}
+
+/**
  * checks whether or not c is a digit
  * @param {string} c - single character
  * @returns {boolean}
@@ -605,6 +620,7 @@ export {
   emptyList,
   fst,
   head,
+  isAlpha,
   isDigit,
   isEmpty,
   isList,

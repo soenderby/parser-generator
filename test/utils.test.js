@@ -13,6 +13,7 @@ import {
   isList,
   isNonEmpty,
   isTuple,
+  isAlpha,
   isDigit,
   list,
   listToArray,
@@ -301,6 +302,20 @@ describe('Utils', () => {
 
       it('should return false if given non-empty string', () => {
         assert.isFalse(isEmpty('a'));
+      });
+    });
+
+    describe('isAlpha', () => {
+      it('should return false for \'1\'', () => {
+        assert.isFalse(isAlpha('1'));
+      });
+
+      it('should return true for \'a\'', () => {
+        assert.isTrue(isAlpha('a'));
+      });
+
+      it('should return true for \'A\'', () => {
+        assert.isTrue(isAlpha('A'));
       });
     });
 

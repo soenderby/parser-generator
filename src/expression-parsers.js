@@ -193,8 +193,6 @@ const fact = str => {
     return name => callOperation(name, head(args));
   }
 
-  const temp = str => list(tuple(drop(1, str), variable(take(1, str))));
-
   return alternation(
     alternation(
       apply(constant, integer),
@@ -204,12 +202,12 @@ const fact = str => {
           identifier,
           optionalApply(
             tuple(variable, flippedCallOperation),
-            option(parenthesized(commaList(temp)))
+            option(parenthesized(commaList(expr)))
           )
         )
       )
     ),
-    parenthesized(temp),
+    parenthesized(expr),
     str
   );
 }

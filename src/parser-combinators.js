@@ -1,5 +1,5 @@
 import { epsilon, succeed, symbol } from './elementary-parsers';
-import { apply } from './parser-tranformers';
+import { apply, first } from './parser-tranformers';
 import { curry, chain } from 'ramda';
 import {
     tuple,
@@ -264,6 +264,18 @@ const uncurriedChainRight = (p, s, str) => {
  */
 const chainRight = curry(uncurriedChainRight);
 
+/**
+ * Applies a parser again and again until it fails, and returns the final result
+ * @param {function(string): list} p - parser
+ * @param {string} str - input string
+ * @returns {list} - parse result
+ */
+const uncurriedGreedy = (p, str) => {
+  return first(many(p), str);
+}
+
+const greedy = curry(uncurriedGreedy);
+
 export {
   sequence,
   alternation,
@@ -275,5 +287,6 @@ export {
   pack,
   listOf,
   chainLeft,
-  chainRight
+  chainRight,
+  greedy
 }

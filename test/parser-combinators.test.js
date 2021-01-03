@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, many1, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
+import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, many1, option, pack, listOf, chainLeft, chainRight, greedy } from '../src/parser-combinators';
 import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
   tuple,
@@ -292,6 +292,22 @@ describe('Parser combinators', () => {
         tuple('+2+3 rest', '1')
       );
       const actual = chainRight(satisfy(isDigit), separatorParser, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('greedy', () => {
+    it('should return empty result if parser always fails', () => {
+      const expected = list(tuple('b', ''));
+      const actual = greedy(symbol('a'), 'b');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return the result containing all the results of the given parser', () => {
+      const expected = list(tuple('b', 'aaa'));
+      const actual = greedy(symbol('a'), 'aaab');
 
       assert.deepEqual(actual, expected);
     });

@@ -274,6 +274,7 @@ export {
   option,
   pack,
   parenthesized,
+  bracketed,
   listOf,
   chainLeft,
   chainRight

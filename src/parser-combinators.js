@@ -285,6 +285,8 @@ export {
   many1,
   option,
   pack,
+  parenthesized,
+  bracketed,
   listOf,
   chainLeft,
   chainRight,

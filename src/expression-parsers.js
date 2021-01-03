@@ -1,8 +1,15 @@
 import { apply, optionalApply } from './parser-tranformers';
 import { satisfy, symbol } from './elementary-parsers';
-import { many, option, seqKeepSecond, sequence } from './parser-combinators';
-import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty } from './utils';
+import { many, many1, option, seqKeepSecond, sequence } from './parser-combinators';
+import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty, isAlpha } from './utils';
 import {always, identity, negate} from "ramda";
+
+/**
+ * Parses string to word (containing only alphabetical charachters)
+ * @param {string} str - input string
+ * @returns {list} - parse results
+ */
+const identifier = str => many1(satisfy(isAlpha), str)
 
 /**
  * Parses single digit character to a single integer
@@ -91,6 +98,7 @@ const fixed = str => {
 }
 
 export {
+  identifier,
   digit,
   natural,
   fract,

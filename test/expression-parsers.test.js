@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
 import { list, tuple, map, head, snd, take, nth } from '../src/utils';
-import { digit, natural, fract, fixed, integer } from '../src/expression-parsers';
+import {digit, natural, fract, fixed, integer, identifier} from '../src/expression-parsers';
 import {many} from "../src/parser-combinators";
 
 const chaiAlmost = require('chai-almost');
@@ -10,9 +10,28 @@ chai.use(chaiAlmost());
 const firstParseResult= result => snd(head(result));
 
 describe('Expression Parsers', () => {
+  describe('identifier', () => {
+    it ('should return empty list on numbers', () => {
+      const expected = list();
+      const actual = identifier('123');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it ('should return first word in list of words', () => {
+      const expected = list(
+        tuple(' dog', 'The'),
+        tuple('e dog', 'Th'),
+        tuple('he dog', 'T')
+      );
+      const actual = identifier('The dog');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
   /* number parsers */
   describe('digit', () => {
-
     it('should recognize 0', () => {
       assert.deepEqual(digit('0'), list(tuple('', 0)));
     });

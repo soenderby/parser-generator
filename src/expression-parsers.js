@@ -169,7 +169,7 @@ const fact = str => {
     const f = snd(t);
     return f(x);
   };
-  const flippedCallOperation = (args, name) => callOperation(name, args);
+  const flippedCallOperation = t => callOperation(snd(t), fst(t));
 
   return alternation(
     alternation(
@@ -179,7 +179,7 @@ const fact = str => {
         sequence(
          identifier,
          optionalApply(
-           tuple(variable, flippedCallOperation),
+           tuple(variable, always(flippedCallOperation)),
            option(parenthesized(commaList(expr)))
          )
         )

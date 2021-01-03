@@ -316,6 +316,8 @@ const max = R.max;
  * @param {list | *} obj
  */
 const fmap = (f, obj) =>  {
+  if (obj === null)
+    throw Error(`expected obj ${f} to have value`);
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 

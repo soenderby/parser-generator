@@ -13,7 +13,8 @@ import {
   chainRight,
   parenthesized,
   bracketed,
-  greedy
+  greedy,
+  greedy1
 } from '../src/parser-combinators';
 import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
@@ -420,4 +421,21 @@ describe('Parser combinators', () => {
       assert.deepEqual(actual, expected);
     });
   });
+
+  describe('greedy1', () => {
+    it('should return empty list if parser fails first time', () => {
+      const expected = list();
+      const actual = greedy1(symbol('a'), 'b');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return the result containing all the results of the given parser', () => {
+      const expected = list(tuple('b', 'aaa'));
+      const actual = greedy1(symbol('a'), 'aaab');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
 });

@@ -274,7 +274,25 @@ const uncurriedGreedy = (p, str) => {
   return first(many(p), str);
 }
 
+/**
+ * @see uncurriedGreedy
+ */
 const greedy = curry(uncurriedGreedy);
+
+/**
+ * Applies a parser again and again until it fails, and returns the final result (expects at least one parse)
+ * 
+ * @param {function(string): list} p - parser
+ * @param {*} str 
+ */
+const uncurriedGreedy1 = (p, str) => {
+  return first(many1(p), str);
+};
+
+/**
+ * @see uncurriedGreedy1
+ */
+const greedy1 = curry(uncurriedGreedy1);
 
 export {
   sequence,
@@ -290,5 +308,6 @@ export {
   listOf,
   chainLeft,
   chainRight,
-  greedy
+  greedy,
+  greedy1
 }

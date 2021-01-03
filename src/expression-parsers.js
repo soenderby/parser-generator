@@ -1,7 +1,7 @@
 import { apply, optionalApply } from './parser-tranformers';
 import { satisfy, symbol } from './elementary-parsers';
 import { many, many1, option, seqKeepSecond, sequence } from './parser-combinators';
-import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty, isAlpha } from './utils';
+import { isDigit, foldl, foldr, snd, fst, tuple, isEmpty, isAlpha, isString, curry } from './utils';
 import {always, identity, negate} from "ramda";
 
 /**
@@ -111,6 +111,25 @@ const float = str => {
   );
 }
 
+const uncurriedBinaryOperation = (operation, left, right) => {
+  if(!isString(operation))
+    throw new TypeError('expected operation to be string');
+
+  return {
+    operation: operation,
+    operands: {
+      left: left,
+      right: right
+    }
+  }
+}
+const binaryOperation = curry(uncurriedBinaryOperation);
+
+const addition = binaryOperation('addition');
+const subtraction = binaryOperation('subtraction');
+const multiplication = binaryOperation('multiplication');
+const division = binaryOperation('division');
+
 export {
   identifier,
   digit,
@@ -118,5 +137,10 @@ export {
   fract,
   integer,
   fixed,
-  float
+  float,
+  binaryOperation,
+  addition,
+  subtraction,
+  multiplication,
+  division
 }

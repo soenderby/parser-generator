@@ -14,7 +14,8 @@ import {
   parenthesized,
   bracketed,
   greedy,
-  greedy1
+  greedy1,
+  compulsion
 } from '../src/parser-combinators';
 import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
@@ -433,6 +434,22 @@ describe('Parser combinators', () => {
     it('should return the result containing all the results of the given parser', () => {
       const expected = list(tuple('b', 'aaa'));
       const actual = greedy1(symbol('a'), 'aaab');
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('compulsion', () => {
+    it('should not fail if the construct is not present', () => {
+      const expected = list(tuple('string', ''));
+      const actual = compulsion(symbol('a'), 'string');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should accept the construct if it is present', () => {
+      const expected = list(tuple('string', 'a'));
+      const actual = compulsion(symbol('a'), 'astring');
 
       assert.deepEqual(actual, expected);
     });

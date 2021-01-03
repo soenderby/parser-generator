@@ -1,5 +1,18 @@
 import { assert } from 'chai';
-import { sequence, alternation, seqKeepFirst, seqKeepSecond, many, many1, option, pack, listOf, chainLeft, chainRight } from '../src/parser-combinators';
+import {
+  sequence,
+  alternation,
+  seqKeepFirst,
+  seqKeepSecond,
+  many,
+  many1,
+  option,
+  pack,
+  listOf,
+  chainLeft,
+  chainRight,
+  parenthesized
+} from '../src/parser-combinators';
 import { fail, symbol, satisfy } from '../src/elementary-parsers';
 import {
   tuple,
@@ -229,6 +242,37 @@ describe('Parser combinators', () => {
       
       const expected = list(tuple( ' remainder', 'pack' ));
       const actual = pack(symbol('{'), parseToken('pack'))(symbol('}'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('parenthesized', () => {
+    const parseToken = token => str => list(tuple(drop(token.length, str), take(token.length, str)));
+
+    it ('should not parse a section if missing start delimiter', () => {
+      const inputString = 'pack)';
+
+      const expected = list();
+      const actual = parenthesized(parseToken('pack'), inputString);
+
+      assert.deepEqual(actual, expected);
+    })
+
+    it('should parse a section that is between a start and end delimiter', () => {
+      const inputString = '(pack)';
+
+      const expected = list(tuple( '', 'pack' ));
+      const actual = parenthesized(parseToken('pack'), inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse a section that is between a start and end delimiter, and return remainder', () => {
+      const inputString = '(pack) remainder';
+
+      const expected = list(tuple( ' remainder', 'pack' ));
+      const actual = parenthesized(parseToken('pack'), inputString);
 
       assert.deepEqual(actual, expected);
     });

@@ -273,6 +273,7 @@ export {
   many1,
   option,
   pack,
+  parenthesized,
   listOf,
   chainLeft,
   chainRight

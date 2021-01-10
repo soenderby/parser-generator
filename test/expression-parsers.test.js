@@ -293,5 +293,55 @@ describe('Expression Parsers', () => {
 
       assert.deepEqual(actual, expected);
     });
+
+    it('should parse \'(a+b)/c\' to addition', () => {
+      const expected = list(
+        tuple('', division(addition(variable('a'), variable('b')), variable('c'))),
+        tuple('/c', addition(variable('a'), variable('b'))),
+      );
+      const actual = expr('(a+b)/c');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'f(x)\' to callOperation', () => {
+      const expected = list(
+        tuple('', callOperation('f', list(variable('x')))),
+        tuple('(x)', variable('f'))
+      );
+      const actual = expr('f(x)');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'f(x,y)\' to callOperation', () => {
+      const expected = list(
+        tuple('', callOperation('f', list(variable('x'), variable('y')))),
+        tuple('(x,y)', variable('f'))
+      );
+      const actual = expr('f(x,y)');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'f(x,y)\' to callOperation', () => {
+      const expected = list(
+        tuple('', callOperation('f', list(variable('x'), variable('y')))),
+        tuple('(x,y)', variable('f'))
+      );
+      const actual = expr('f(x,y)');
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should parse \'f(x+y)\' to callOperation', () => {
+      const expected = list(
+        tuple('', callOperation('f', list(addition(variable('x'), variable('y'))))),
+        tuple('(x+y)', variable('f'))
+      );
+      const actual = expr('f(x+y)');
+
+      assert.deepEqual(actual, expected);
+    });
   });
 });

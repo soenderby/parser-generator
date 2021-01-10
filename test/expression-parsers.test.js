@@ -107,8 +107,7 @@ describe('Expression Parsers', () => {
       const expected = list(
         tuple('', 123),
         tuple('3', 12),
-        tuple('23', 1),
-        tuple('123', 0)
+        tuple('23', 1)
       );
       const actual = natural('123');
 
@@ -121,8 +120,7 @@ describe('Expression Parsers', () => {
       const expected = list(
         tuple('', 123),
         tuple('3', 12),
-        tuple('23', 1),
-        tuple('123', 0)
+        tuple('23', 1)
       );
       const actual = integer('123');
 
@@ -134,8 +132,6 @@ describe('Expression Parsers', () => {
         tuple('', -123),
         tuple('3', -12),
         tuple('23', -1),
-        tuple('123', -0),
-        tuple('-123', 0)
       );
       const actual = integer('-123');
 
@@ -165,17 +161,11 @@ describe('Expression Parsers', () => {
         tuple('', 12.3),
         tuple('3', 12.0),
         tuple('.3', 12.0),
-        tuple('2.3', 1.0),
-        tuple('12.3', 0.0)
+        tuple('2.3', 1.0)
       );
       const actual = fixed('12.3');
 
-      // not perfect, but chai-almost does not support generators
-      expect(nth(0, actual)).to.deep.almost(nth(0, expected), 0.01);
-      expect(nth(1, actual)).to.deep.almost(nth(1, expected), 0.01);
-      expect(nth(2, actual)).to.deep.almost(nth(2, expected), 0.01);
-      expect(nth(3, actual)).to.deep.almost(nth(3, expected), 0.01);
-      expect(nth(4, actual)).to.deep.almost(nth(4, expected), 0.01);
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -183,19 +173,12 @@ describe('Expression Parsers', () => {
     it('should parse string that contains a float and return result as a float', () => {
       const expected = list(
         tuple('', 12000.0),
-        tuple('3', 12.0),
         tuple('E3', 12.0),
-        tuple('2E3', 1.0),
-        tuple('12E3', 0.0)
+        tuple('2E3', 1.0)
       );
       const actual = float('12E3');
 
-      // not perfect, but chai-almost does not support generators
-      expect(nth(0, actual)).to.deep.almost(nth(0, expected), 0.01);
-      expect(nth(1, actual)).to.deep.almost(nth(1, expected), 0.01);
-      expect(nth(2, actual)).to.deep.almost(nth(2, expected), 0.01);
-      expect(nth(3, actual)).to.deep.almost(nth(3, expected), 0.01);
-      expect(nth(4, actual)).to.deep.almost(nth(4, expected), 0.01);
+      assert.deepEqual(actual, expected);
     });
   });
 

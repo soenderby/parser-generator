@@ -27,7 +27,8 @@ import {
   list,
   isList,
   head,
-  map
+  map,
+  nth
 } from './utils';
 import {always, flip, identity, negate} from "ramda";
 
@@ -116,7 +117,7 @@ const fixed = str => {
     sequence(
       integer,
       optionalApply(
-        tuple(0.0, identity),
+        tuple(0.0, x => nth(0, x)),
         option(seqKeepSecond(symbol('.'), fract))
       )
     ),
@@ -132,7 +133,10 @@ const float = str => {
     t => f(fst(t), snd(t)),
     sequence(
       fixed,
-      optionalApply(tuple(0.0, identity), option(seqKeepSecond(symbol('E'), integer)))
+      optionalApply(
+        tuple(0.0, x => nth(0, x)),
+        option(seqKeepSecond(symbol('E'), integer))
+      )
     ),
     str
   );

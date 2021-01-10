@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import {sp, just, apply, some, optionalApply, first} from '../src/parser-tranformers';
 import { list, tuple } from '../src/utils';
-import { symbol } from '../src/elementary-parsers';
-import { many } from '../src/parser-combinators';
+import { symbol, token } from '../src/elementary-parsers';
+import { listOf, many, sequence } from '../src/parser-combinators';
 import {identity} from "ramda";
 
 describe('Parser transformers', () => {
@@ -23,6 +23,20 @@ describe('Parser transformers', () => {
 
       const expected = list(tuple( 'b   ', 'a' ));
       const actual = sp(parseOneItem, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should work in a sequence', () => {
+      const expected = list(tuple('', tuple('token','a')));
+      const spsymbol = s => sp(symbol(s));
+      const sptoken = t => sp(token(t));
+
+      const actual = sequence(
+        sptoken('token'),
+        spsymbol('a'),
+        'token a'
+      );
 
       assert.deepEqual(actual, expected);
     });

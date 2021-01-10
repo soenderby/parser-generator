@@ -9,12 +9,12 @@ import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction, equ
  * @returns {list} parser output
  */
 const uncurriedSp = (p, str) => p(dropWhile(equals(' '), str));
+
 /** @see uncurriedSp */
 const sp = curry(uncurriedSp);
 
 /**
  * Only returns results with empty remainder
- * This could be improved with a filter function for lists
  * @param {function} p - parser
  * @param {string} str - input string
  * @returns {list} parser output
@@ -28,11 +28,8 @@ const uncurriedJust = (p, str) => {
 /** @see uncurriedJust */
 const just = curry(uncurriedJust);
 
-// This applies a given funciton to the result of a given parser
-// This can be used to add semantic functions to parsers
-
 /**
- * Returns a parser that does the same as the given parser, but applied the given
+ * Returns a parser that does the same as the given parser, but applies the given
  * function to the resulting parse tree.
  * @param {function} f - function to apply
  * @param {function(string): list} p - parser
@@ -70,8 +67,7 @@ const uncurriedOptionalApply = (t, p, str) => {
 const optionalApply = curry(uncurriedOptionalApply);
 
 /**
- * It is possible that this should be able to handle lists of results.
- * It should also fail if there are no results with an empty remainder
+ * parses text, guarantees empty rest string, picks the first solution, and delivers the parse tree only
  * @param p - parser to be applied
  * @param str - input string
  */

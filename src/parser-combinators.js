@@ -151,7 +151,7 @@ const option = curry(uncurriedOption);
 /**
  * Parses a pack of symbols, starting with delimiter, content and ending in a deliminator
  * @param {function(string): list} s1 - startDelimiter
- * @param {function(string):list} p - contentParser
+ * @param {function(string): list} p - contentParser
  * @param {function(string): list} s2 endDelimiter
  * @param {string} str - input string string
  * @returns {list}

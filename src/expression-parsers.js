@@ -212,6 +212,12 @@ const fact = str => {
   );
 }
 
+/**
+ * 
+ * @param {List} ops - List of tuples containing operators and the associated tree constructors
+ * @param {function(string): list} p - Parser for items between operators
+ * @param {*} str - Input string
+ */
 const uncurriedGen = (ops, p, str) => {
   const f = t => apply(always(snd(t)), symbol(fst(t)));
 
@@ -229,7 +235,9 @@ const addis = list(
   tuple('-', flip(subtraction)),
 );
 
-const expr = gen(addis, gen(multis, fact));
+//const expr = gen(addis, gen(multis, fact));
+
+const expr = foldr(gen, fact, list(addis, multis));
 
 export {
   identifier,

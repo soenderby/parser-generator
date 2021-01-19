@@ -18,9 +18,10 @@ import {
   compulsion,
   compound,
   commaList,
-  semicList
+  semicList,
+  choice
 } from '../src/parser-combinators';
-import { fail, symbol, satisfy } from '../src/elementary-parsers';
+import { fail, symbol, satisfy, token } from '../src/elementary-parsers';
 import {
   tuple,
   piecewise,
@@ -34,7 +35,7 @@ import {
   take,
   drop,
   curry,
-  isDigit
+  isDigit,
 } from '../src/utils';
 import { digit } from '../src/expression-parsers';
 
@@ -206,6 +207,22 @@ describe('Parser combinators', () => {
 
       const expected = list(tuple('baa', 'a'));
       const actual = many1(parseA, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+  });
+
+  describe('choice', () => {
+    it('should iterate the alternation parser', () => {
+      const expected = list(tuple('bc', 'a'), tuple('c', 'ab'), tuple('', 'abc'));
+
+      const parserlist = list(
+        symbol('a'),
+        token('ab'),
+        token('abc')
+      );
+
+      const actual = choice(parserlist)('abc');
 
       assert.deepEqual(actual, expected);
     });

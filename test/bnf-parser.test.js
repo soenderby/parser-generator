@@ -31,6 +31,33 @@ describe('bnf parser', () => {
       
       assert.deepEqual(actual, expected);
     });
+
+    it('should work when image consists of nested lists', () => {
+      const environment = list(
+        tuple(Nont('BLOCK'), list( 
+          list(
+            Term('begin'),
+            Nont('BLOCK'),
+            Term('end'),
+            Nont('BLOCK')
+          )
+        ))
+      );
+
+      const expected = list( 
+        list(
+          Term('begin'),
+          Nont('BLOCK'),
+          Term('end'),
+          Nont('BLOCK')
+        )
+      );
+
+      const sym = Nont('BLOCK');
+      const actual = assoc(environment, sym);
+
+      assert.deepEqual(actual, expected);
+    });
   });
 
   describe('mapenv', () => {
@@ -68,7 +95,8 @@ describe('bnf parser', () => {
             Nont('BLOCK'),
             Term('end'),
             Nont('BLOCK')
-          )
+          ),
+          list()
         ))
       );
 

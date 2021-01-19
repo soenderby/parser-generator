@@ -18,7 +18,7 @@ const uncurriedAssoc = (env, x) => {
   const u = fst(w);
   const v = snd(w);
 
-  if(x === u)
+  if(JSON.stringify(x) === JSON.stringify(u) )
     return v;
   else
     return assoc(ws, x);
@@ -63,7 +63,7 @@ const Term = value => {
 
 const Nont = value => {
   return {
-    type: 'nontermial',
+    type: 'nonterminal',
     value: value
   }
 };
@@ -81,36 +81,31 @@ const uncurriedBnf = (nontp, termp, str) => {
   const sptoken = t => sp(token(t));
 
   // Parses a nonterminal and creates the parse tree for it
-  const nont = (str) => {
-    return apply(
+  const nont = (str) => 
+    apply(
       Nont, 
       sp(nontp),
       str
     );
-  };
 
   // parses a terminal and creates the parse tree for it
-  const term = (str) => {
-    return apply(
+  const term = (str) => 
+    apply(
       Term, 
       sp(termp),
       str
     );
-  };
 
-  const alt = (str) => {
-    return many(
+  const alt = (str) =>  
+    many(
       alternation(term, nont),
       str
     );
-  };
 
-  const rhs = (str) => {
-    return listOf(alt, spsymbol('|'), str);
-  };
+  const rhs = (str) => listOf(alt, spsymbol('|'), str);
 
-  const rule = (str) => {
-    return sequence(
+  const rule = (str) => 
+    sequence(
       nont, 
       seqKeepSecond(
         sptoken('::='),
@@ -120,7 +115,6 @@ const uncurriedBnf = (nontp, termp, str) => {
         )),
       str
     );
-}
 
   return many(rule, str);
 };

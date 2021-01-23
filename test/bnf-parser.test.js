@@ -79,7 +79,7 @@ describe('bnf parser', () => {
   });
   
   describe('bnf', function() {
-    this.timeout(10000);
+    this.timeout(100000);
 
     it('should parse a string containing a bnf grammar', () => {
       const blockgram = 'BLOCK ::= begin BLOCK end BLOCK  |  .';

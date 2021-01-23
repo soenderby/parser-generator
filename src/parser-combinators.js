@@ -2,22 +2,22 @@ import { epsilon, succeed, symbol, fail } from './elementary-parsers';
 import { apply, first } from './parser-tranformers';
 import { curry, chain } from 'ramda';
 import {
-    tuple,
-    map,
-    head,
-    fst,
-    snd,
-    list,
-    concat,
-    fmap,
-    foldl,
-    foldr,
-    recursiveList,
-    piecewise,
-    isEmpty,
-    otherwise,
-    emptyList, isList,
-    isString
+  tuple,
+  map,
+  head,
+  fst,
+  snd,
+  list,
+  concat,
+  fmap,
+  foldl,
+  foldr,
+  recursiveList,
+  piecewise,
+  isEmpty,
+  otherwise,
+  emptyList, isList,
+  isString, isTuple
 } from './utils';
 
 /**
@@ -92,6 +92,13 @@ const uncurriedSeqKeepSecond = (p1, p2, str) => {
 /** @see uncurriedSeqKeepSecond */
 const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 
+const isParserResultString = (res) => {
+  if (head(res) === undefined)
+    return false;
+  if (!isTuple(head(res)))
+    return false;
+  return isString(snd(head(res)))
+}
 /**
  * Applies a parser again and again until it fails
  * @param {function(string): list} p - parser
@@ -101,7 +108,7 @@ const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 const uncurriedMany = (p, str) => {
   return alternation(
     apply(t => concat(list(fst(t)), snd(t)), sequence(p, many(p))),
-    succeed(emptyList(str)),
+    succeed(isParserResultString(p(str))? "" : list()),
     str
   );
 };

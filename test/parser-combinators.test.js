@@ -167,7 +167,7 @@ describe('Parser combinators', () => {
     it('should not apply a given parser if it fails the first time', () => {
       const inputString = 'baa';
 
-      const expected = list(tuple('baa', ''));
+      const expected = list(tuple('baa', []));
       const actual = many(parseA, inputString);
 
       assert.deepEqual(actual, expected);
@@ -479,7 +479,7 @@ describe('Parser combinators', () => {
 
   describe('greedy', () => {
     it('should return empty result if parser always fails', () => {
-      const expected = list(tuple('b', ''));
+      const expected = list(tuple('b', []));
       const actual = greedy(symbol('a'), 'b');
 
       assert.deepEqual(actual, expected);

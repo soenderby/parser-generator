@@ -6,7 +6,8 @@ import {
   list,
   take,
   drop,
-  curry
+  curry,
+  equals
 } from './utils';
 
 /**
@@ -50,7 +51,7 @@ const symbol = curry(uncurriedSymbol);
 const uncurriedToken = (k, xs) => {
   const n = k.length;
 
-  return k === take(n, xs) ? list(tuple(drop(n, xs), k))
+  return equals(k, take(n, xs)) ? list(tuple(drop(n, xs), k))
                            : list();
 };
 /** @see uncurriedToken */

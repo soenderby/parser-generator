@@ -8,6 +8,8 @@ import * as chai from 'chai';
  * @returns { list | string }
  */
 const list = (...args) => {
+  return args;
+  /*
   if (args.length > 0 && args.every(isString))
     return args.join('');
 
@@ -15,7 +17,7 @@ const list = (...args) => {
     for (const arg of args) {
       yield arg
     }
-  }
+  }*/
 }
 
 /**
@@ -75,6 +77,20 @@ const tuple = (...args) => {
   };
 }
 
+/**
+ * Creates a string compatible with list
+ * @param {string} chars
+ * @returns {*[]}
+ */
+const string = chars => {
+  return [...chars]
+  /*return function* () {
+    for (const char of chars) {
+      yield char;
+    }
+  }*/
+}
+
 /* Data types (duck typing) */
 /**
  * Determines whether or not obj is an array
@@ -124,19 +140,21 @@ const isDigit = c => {
   return c === '0' || c === '1' || c === '2' || c === '3' || c === '4' || c === '5' || c === '6' || c === '7' || c === '8' || c === '9';
 }
 
+const isGenerator = obj => obj !== null && obj !== undefined && obj.constructor.name === 'GeneratorFunction';
+
 /**
  * Determines whether or not obj is a list
  * @param {*} obj
  * @return {boolean}
  */
-const isList = obj => obj !== null && obj !== undefined && obj.constructor.name === 'GeneratorFunction';
+const isList = isArray;
 
 /**
  * Determines whether or not obj is a string
  * @param obj
  * @return {boolean}
  */
-const isString = obj => typeof obj === 'string';
+const isString = obj => typeof obj === 'string' || isList(obj);
 
 /**
  * Determines whether or not obj is a tuple
@@ -198,16 +216,13 @@ const curry = R.curry;
  * @returns {array | list | string}
  */
 const concat = (list1, list2) => {
-  if (isNonEmpty(list1) && isEmpty(list2))
-    return list1;
-
-  if (isEmpty(list1) && isNonEmpty(list2))
-    return list2;
-
-  if ((isArray(list1) && isArray(list2)) || (isString(list1) && isString(list2)))
+  if ((isArray(list1) && isArray(list2)))
     return R.concat(list1, list2);
 
-  if (isList(list1) && isList(list2)){
+  if (isString(list1) && isString(list2))
+    return list(list1, list2);
+
+  if (isGenerator(list1) && isGenerator(list2)){
     return function* () {
       for (const item of list1()) {
         yield item;
@@ -234,7 +249,7 @@ const drop = (n, list) => {
   if (isArray(list) || isString(list))
     return R.drop(n, list);
 
-  if (isList(list)){
+  if (isGenerator(list)){
     return function* () {
       let iterator = list();
 
@@ -263,7 +278,7 @@ const dropWhile = (f, list) => {
   if (isArray(list) || isString(list))
     return R.dropWhile(f, list);
 
-  if (isList(list)){
+  if (isGenerator(list)){
     return function* () {
       let iterator = list();
 
@@ -297,7 +312,7 @@ const map = (f, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 
-  if (isList(list)){
+  if (isGenerator(list)){
     return function* () {
       for (let item of list()) {
         yield f(item);
@@ -321,12 +336,12 @@ const fmap = (f, obj) =>  {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 
-  if (isList(obj)) {
+  if (isGenerator(obj)) {
     return function* () {
       for (let item of obj()) {
         let result = f(item);
 
-        if (!isList(result))
+        if (!isGenerator(result))
           throw TypeError(`expected f ${f} to return a list when obj is a list`);
 
         yield* result();
@@ -346,7 +361,7 @@ const filter = (f, obj) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 
-  if (isList(obj)) {
+  if (isGenerator(obj)) {
     return function* () {
       for (let item of obj()) {
         let result = f(item);
@@ -394,7 +409,7 @@ const foldl = curry(uncurriedFoldl);
 const uncurriedFoldr = (f, z, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
-  if (!isArray(list) && !isList(list) && !isString(list))
+  if (!isArray(list) && !isGenerator(list) && !isString(list))
     throw TypeError(`expected list ${list} to be a array, list or string`);
 
   const x = head(list);
@@ -415,7 +430,7 @@ const isEmpty = (obj) => {
   if (isString(obj) || isArray(obj))
     return R.isEmpty(obj);
 
-  if (isList(obj))
+  if (isGenerator(obj))
     return obj().next().done;
 
   throw TypeError(`expected obj ${obj} to be array, string or list`);
@@ -437,7 +452,7 @@ const head = (obj) => {
   if (isArray(obj) || isString(obj))
     return R.head(obj);
 
-  if (isList(obj))
+  if (isGenerator(obj))
     return obj().next().value;
 
   throw TypeError(`expected obj ${obj} to be array, string or list`);
@@ -459,7 +474,7 @@ const nth = (n, obj) => {
   if (isArray(obj) || isString(obj))
     return R.nth(n, obj);
 
-  if (isList(obj)){
+  if (isGenerator(obj)){
     let iterator = obj();
     let i = 0;
 
@@ -487,7 +502,7 @@ const tail = (obj) => {
   if (isArray(obj) || isString(obj))
     return R.tail(obj);
 
-  if (isList(obj)) {
+  if (isGenerator(obj)) {
     return function* () {
       let iterator = obj();
 
@@ -513,7 +528,7 @@ const take = (n, obj) => {
   if (isArray(obj) || isString(obj))
     return R.take(n, obj);
 
-  if (isList(obj)){
+  if (isGenerator(obj)){
     return function* () {
       let iterator = obj();
 
@@ -537,16 +552,23 @@ const take = (n, obj) => {
  * @returns {[]}
  */
 const listToArray = (list, maxLength = 100) => {
-  const array = [];
-  const iterator = list.apply();
+  let array = [];
 
-  for (let i = 0; i < maxLength; i++) {
-    let iteration = iterator.next();
+  if (isGenerator(list)){
+    const iterator = list.apply();
 
-    if (iteration.done)
-      break;
-    else array.push(iteration.value);
+    for (let i = 0; i < maxLength; i++) {
+      let iteration = iterator.next();
+
+      if (iteration.done)
+        break;
+      else array.push(iteration.value);
+    }
   }
+  else if(isArray(list))
+    array = list;
+  else throw new Error('list was expected to be array or generator');
+
   return array;
 }
 
@@ -563,7 +585,7 @@ const listToArrayRecursively = (obj, maxLength = 100, depth = 0) => {
   if (depth > 10)
     return obj;
 
-  if (isList(obj))
+  if (isGenerator(obj))
     return listToArray(obj).map(func);
   if (isArray(obj))
     return obj.map(func);
@@ -649,5 +671,7 @@ export {
   equals,
   max,
   foldl,
-  foldr
+  foldr,
+  string,
+  isArray
 }

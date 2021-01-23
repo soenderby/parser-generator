@@ -27,15 +27,16 @@ import {
   tail,
   take,
   tuple,
+  string,
 } from '../src/utils';
 
 describe('Utils', () => {
   describe('Data structures', () => {
-    describe('emptyList', () => {
+    /* describe('emptyList', () => {
       it('should satisfy isList', () => {
         assert.isTrue(isList(emptyList(list())));
       });
-    });
+    }); */
 
     describe('list', () => {
       it('should satisfy isList', () => {
@@ -43,7 +44,7 @@ describe('Utils', () => {
       });
     });
 
-    describe('recursiveList', () => {
+    /* describe('recursiveList', () => {
       it('should satisfy isList', () => {
         const l = recursiveList(1, n => n);
         assert.isTrue(isList(l))
@@ -66,7 +67,7 @@ describe('Utils', () => {
         ));
         assert.deepEqual(actual, expected);
       });
-    });
+    });*/
 
     describe('tuple', () => {
       it('should satisfy isTuple', () => {
@@ -125,8 +126,8 @@ describe('Utils', () => {
       });
 
       it('should return combined string if given strings', () => {
-        const expected = 'abc';
-        const actual = concat('a', 'bc');
+        const expected = string('abc');
+        const actual = concat(string('a'), string('bc'));
 
         assert.deepEqual(actual, expected);
       });
@@ -174,8 +175,8 @@ describe('Utils', () => {
       });
 
       it('should return the same string if given string', () => {
-        const expected = 'abc';
-        const actual = foldl(append, '', 'abc');
+        const expected = string('abc');
+        const actual = foldl(append, '', string('abc'));
 
         assert.deepEqual(actual, expected);
       });
@@ -220,8 +221,8 @@ describe('Utils', () => {
       });
 
       it('should return a reversed string if given string', () => {
-        const expected = 'abc';
-        const actual = foldr(prepend, '', 'abc');
+        const expected = string('abc');
+        const actual = foldr(prepend, '', string('abc'));
 
         assert.deepEqual(actual, expected);
       });

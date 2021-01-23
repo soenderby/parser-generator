@@ -28,7 +28,8 @@ import {
   isList,
   head,
   map,
-  nth
+  nth,
+  isArray
 } from './utils';
 import {always, flip, identity, negate} from "ramda";
 
@@ -145,21 +146,21 @@ const float = str => {
 const variable = name => {
   return {
     operation: 'variable',
-    name: name
+    name: isArray(name) ? name.join('') : name
   }
 }
 
 const constant = value => {
   return {
     operation: 'constant',
-    value: value
+    value: isArray(value) ? value.join('') : value
   }
 }
 
 const uncurriedCallOperation = (name, args) => {
   return {
     operation: 'function',
-    name: name,
+    name: isArray(name) ? name.join('') : name,
     arguments: args
   }
 }
@@ -191,8 +192,8 @@ const fact = str => {
     return f(x);
   };
   const flippedCallOperation = args => {
-    if (!isList(args))
-      throw TypeError('expected args to be list');
+    //if (!isList(args))
+    //  throw TypeError('expected args to be list');
 
     return name => callOperation(name, head(args));
   }

@@ -15,12 +15,12 @@ const uncurriedNode = (symbol, tree) => {
 const node = curry(uncurriedNode);
 
 const isTerminalNode = (elem) => {
-  return isEmpty(elem.tree) ? true : false;
+  return isEmpty(elem.tree);
 };
 
 const uncurriedConcatSequence = (p1, p2, str) => {
   return apply(
-    t => concat(list(fst(t)), snd(t)),
+    t => concat(fst(t), snd(t)),
     sequence(p1, p2),
     str
   )

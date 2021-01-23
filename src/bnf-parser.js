@@ -1,4 +1,4 @@
-import { concat, curry, fst, head, isEmpty, list, map, snd, tail, tuple } from './utils';
+import { concat, curry, fst, head, isEmpty, list, map, snd, tail, tuple, isArray } from './utils';
 import { symbol, token } from './elementary-parsers';
 import { apply, sp } from './parser-tranformers';
 import { alternation, listOf, many, seqKeepFirst, seqKeepSecond, sequence } from './parser-combinators';
@@ -57,14 +57,14 @@ const mapenv = curry(uncurriedMapenv);
 const Term = value => {
   return {
     type: 'terminal',
-    value: value
+    value: isArray(value) ? value.join('') : value
   }
 }
 
 const Nont = value => {
   return {
     type: 'nonterminal',
-    value: value
+    value: isArray(value) ? value.join('') : value
   }
 };
 

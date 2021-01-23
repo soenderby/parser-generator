@@ -92,13 +92,6 @@ const uncurriedSeqKeepSecond = (p1, p2, str) => {
 /** @see uncurriedSeqKeepSecond */
 const seqKeepSecond = curry(uncurriedSeqKeepSecond);
 
-const isParserResultString = (res) => {
-  if (head(res) === undefined)
-    return false;
-  if (!isTuple(head(res)))
-    return false;
-  return isString(snd(head(res)))
-}
 /**
  * Applies a parser again and again until it fails
  * @param {function(string): list} p - parser
@@ -108,7 +101,7 @@ const isParserResultString = (res) => {
 const uncurriedMany = (p, str) => {
   return alternation(
     apply(t => concat(list(fst(t)), snd(t)), sequence(p, many(p))),
-    succeed(isParserResultString(p(str))? "" : list()),
+    succeed(list()),
     str
   );
 };
@@ -148,7 +141,7 @@ const choice = (listOfParsers) => {
 const uncurriedOption = (p, str) => {
   return alternation(
     apply(x => list(x), p),
-    succeed(emptyList(str)),
+    succeed(list()),
     str
   );
 }

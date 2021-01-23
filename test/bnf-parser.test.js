@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { list, concat, tuple, head } from '../src/utils';
+import { list, concat, tuple, head, string } from '../src/utils';
 import { env, assoc, mapenv, bnf, Term, Nont } from '../src/bnf-parser';
 import { apply, some, sp } from '../src/parser-tranformers';
 import { greedy1 } from '../src/parser-combinators';
@@ -8,8 +8,8 @@ import { satisfy } from '../src/elementary-parsers';
 describe('bnf parser', () => {
   describe('env', () => {
     it('should produce a list with a single tuple', () => {
-      const expected = list(tuple('value1', 2));
-      const actual = env('value1', 2);
+      const expected = list(tuple(string('value1'), 2));
+      const actual = env(string('value1'), 2);
 
       assert.deepEqual(actual, expected);
     });
@@ -17,17 +17,17 @@ describe('bnf parser', () => {
 
   describe('assoc', () => {
     it('should return the image associated with a value in an environment with a single element', () => {
-      const environment = env('value', 'image');
-      const expected = 'image';
-      const actual = assoc(environment, 'value');
+      const environment = env(string('value'), string('image'));
+      const expected = string('image');
+      const actual = assoc(environment, string('value'));
 
       assert.deepEqual(actual, expected);
     });
 
     it('should return the image associated with a value in an environment with multiple elements', () => {
-      const environment = concat(env('value1', 'image1'), env('value2', 'image2'));
-      const expected = 'image2';
-      const actual = assoc(environment, 'value2');
+      const environment = concat(env(string('value1'), string('image1')), env(string('value2'), string('image2')));
+      const expected = string('image2');
+      const actual = assoc(environment, string('value2'));
       
       assert.deepEqual(actual, expected);
     });

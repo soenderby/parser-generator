@@ -1,11 +1,11 @@
 import { assert } from 'chai';
 import { epsilon, fail, satisfy, succeed, symbol, symbola, token } from '../src/elementary-parsers';
-import { list, tuple } from '../src/utils';
+import {list, string, tuple} from '../src/utils';
 
 describe('Elementary parsers', () => {
   describe('epsilon', () => {
     it('should not consume input, and return unmodified input', () => {
-      const inputString = 'input text';
+      const inputString = string('input text');
 
       const expected = list(tuple(inputString, tuple()));
       const actual = epsilon(inputString);
@@ -16,7 +16,7 @@ describe('Elementary parsers', () => {
 
   describe('fail', () => {
     it('should accept input, and generate nothing', () => {
-      const inputString = 'input text';
+      const inputString = string('input text');
 
       const expected = list();
       const actual = fail(inputString);
@@ -28,9 +28,9 @@ describe('Elementary parsers', () => {
   describe('satisfy', () => {
     it('should apply parser if given function evaluates to true', () => {
       const predicate = x => x === 'a';
-      const inputString = 'abc';
+      const inputString = string('abc');
 
-      const expected = list(tuple('bc', 'a'));
+      const expected = list(tuple(string('bc'), 'a'));
       const actual = satisfy(predicate, inputString);
 
       assert.deepEqual(actual, expected);
@@ -38,7 +38,7 @@ describe('Elementary parsers', () => {
 
     it('should not apply parser if given function evaluates to false', () => {
       const predicate = x => x === 'a';
-      const inputString = 'b';
+      const inputString = string('b');
 
       const expected = list();
       const actual = satisfy(predicate, inputString);
@@ -49,8 +49,8 @@ describe('Elementary parsers', () => {
 
   describe('succeed', () => {
     it('should not consume input, and return given value', () => {
-      const givenValue = 'value';
-      const inputString = 'input text';
+      const givenValue = string('value');
+      const inputString = string('input text');
 
       const expected = list(tuple(inputString, givenValue));
       const actual = succeed(givenValue, inputString);
@@ -62,9 +62,9 @@ describe('Elementary parsers', () => {
   describe('symbol', () => {
     it('should parse a single char', () => {
       const charParameter = 'a';
-      const inputString = "an input text";
+      const inputString = string("an input text");
 
-      const expected = list(tuple('n input text', charParameter));
+      const expected = list(tuple(string('n input text'), charParameter));
       const actual = symbol(charParameter, inputString);
 
       assert.deepEqual(actual, expected);
@@ -72,7 +72,7 @@ describe('Elementary parsers', () => {
 
     it('should parse symbol, only if it is the first char in string', () => {
       const charParameter = 'a';
-      const inputString = "input text with a";
+      const inputString = string("input text with a");
 
       const expected = list();
       const actual = symbol(charParameter, inputString);
@@ -82,7 +82,7 @@ describe('Elementary parsers', () => {
 
     it('should not parse anything if no matching symbol', () => {
       const charParameter = 'a';
-      const inputString = "input text";
+      const inputString = string("input text");
 
       const expected = list();
       const actual = symbol(charParameter, inputString);
@@ -93,16 +93,16 @@ describe('Elementary parsers', () => {
 
   describe('symbola', () => {
     it('should parse a single char', () => {
-      const inputString = "an input text";
+      const inputString = string("an input text");
 
-      const expected = list(tuple('n input text', 'a'));
+      const expected = list(tuple(string('n input text'), 'a'));
       const actual = symbola(inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should parse symbol, only if it is the first char in string', () => {
-      const inputString = "input text with a";
+      const inputString = string("input text with a");
 
       const expected = list();
       const actual = symbola(inputString);
@@ -113,18 +113,18 @@ describe('Elementary parsers', () => {
 
   describe('token', () => {
     it('should parse a given substring', () => {
-      const tokenParameter = 'token';
-      const inputString = "token and the rest";
+      const tokenParameter = string('token');
+      const inputString = string("token and the rest");
 
-      const expected = list(tuple(' and the rest', tokenParameter ));
+      const expected = list(tuple(string(' and the rest'), tokenParameter ));
       const actual = token(tokenParameter, inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should not parse if matching token not at the beginning of input string', () => {
-      const tokenParameter = 'token';
-      const inputString = "nothing then token and the rest";
+      const tokenParameter = string('token');
+      const inputString = string("nothing then token and the rest");
 
       const expected = list();
       const actual = token(tokenParameter, inputString);

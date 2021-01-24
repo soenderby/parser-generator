@@ -1,4 +1,4 @@
-import { concat, curry, foldr, fst, head, isEmpty, list, map, snd, tail, tuple } from './utils';
+import { concat, curry, foldr, fst, head, isEmpty, list, map, snd, tail, tuple, isArray, append, prepend, string } from './utils';
 import { succeed, symbol, token } from './elementary-parsers';
 import { apply, sp } from './parser-tranformers';
 import { alternation, choice, listOf, many, seqKeepFirst, seqKeepSecond, sequence } from './parser-combinators';
@@ -7,25 +7,19 @@ import { assoc } from './bnf-parser';
 
 const uncurriedNode = (symbol, tree) => {
   return {
-    symbol: symbol,
+    symbol: isArray(symbol) ? symbol.join('') : symbol,
     tree: tree
   }
 };
-
 const node = curry(uncurriedNode);
-
-const isTerminalNode = (elem) => {
-  return isEmpty(elem.tree);
-};
 
 const uncurriedConcatSequence = (p1, p2, str) => {
   return apply(
-    t => concat(fst(t), snd(t)),
+    t => prepend(fst(t), snd(t)),
     sequence(p1, p2),
     str
   )
 };
-
 const concatSequence = curry(uncurriedConcatSequence);
 
 const uncurriedListSequence = (parsers) => {
@@ -35,13 +29,12 @@ const uncurriedListSequence = (parsers) => {
     parsers
   )
 };
-
 const listSequence = curry(uncurriedListSequence);
 
 // Expects either a terminal or a nonterminal symbol
 const uncurriedParsSym = (gram, sym, symbols) => {
   const sptoken = t => sp(token(t));
-  const s = sym.value;
+  const s = string(sym.value);
 
   if(sym.type === 'terminal') {
     // Possible this should use token instead of symbol

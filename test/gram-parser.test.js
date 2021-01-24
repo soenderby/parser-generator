@@ -58,7 +58,7 @@ describe('Gram parser', () => {
           )
         ));
       const expected = list(
-        tuple('', 
+        tuple(string(''),
           node('s', 
             list(
               node('s', list())
@@ -78,12 +78,7 @@ describe('Gram parser', () => {
     it('should generate a parser for an alternative', () => {
       const gram = list();
       const expected = list(
-        tuple('', 
-          list(
-            node('a', list()),
-            node('b', list())
-          )
-        )
+        tuple(string(''), list(node('a', list()), node('b', list())))
       );
 
       const alt = list(Term('a'), Term('b'));
@@ -97,9 +92,7 @@ describe('Gram parser', () => {
     it('should generate parsers for each alternative and make a choice from them', () => {
       const gram = list();
       const expected = list(
-        tuple('', 
-          list(node('s', list()))
-        )
+        tuple(string(''), list(node('s', list())))
       );
 
       const sym = list(list(Term('s')));

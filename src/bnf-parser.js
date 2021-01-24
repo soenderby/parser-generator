@@ -1,4 +1,4 @@
-import { concat, curry, fst, head, isEmpty, list, map, snd, tail, tuple, isArray } from './utils';
+import { concat, curry, fst, head, isEmpty, list, map, snd, tail, tuple, isArray, string } from './utils';
 import { symbol, token } from './elementary-parsers';
 import { apply, sp } from './parser-tranformers';
 import { alternation, listOf, many, seqKeepFirst, seqKeepSecond, sequence } from './parser-combinators';
@@ -108,7 +108,7 @@ const uncurriedBnf = (nontp, termp, str) => {
     sequence(
       nont, 
       seqKeepSecond(
-        sptoken('::='),
+        sptoken(string('::=')),
         seqKeepFirst(
           rhs,
           spsymbol('.')

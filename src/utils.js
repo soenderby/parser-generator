@@ -161,7 +161,7 @@ const isString = obj => typeof obj === 'string' || isList(obj);
  * @param obj
  * @return {boolean}
  */
-const isTuple = obj => obj.hasOwnProperty('fst') && obj.hasOwnProperty('snd');
+const isTuple = obj => obj !== null && obj !== undefined && obj.hasOwnProperty('fst') && obj.hasOwnProperty('snd');
 
 /**
  * Determines whether or not obj is a boolean

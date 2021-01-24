@@ -34,26 +34,26 @@ describe('bnf parser', () => {
 
     it('should work when image consists of nested lists', () => {
       const environment = list(
-        tuple(Nont('BLOCK'), list( 
+        tuple(Nont(string('BLOCK')), list(
           list(
-            Term('begin'),
-            Nont('BLOCK'),
-            Term('end'),
-            Nont('BLOCK')
+            Term(string('begin')),
+            Nont(string('BLOCK')),
+            Term(string('end')),
+            Nont(string('BLOCK'))
           )
         ))
       );
 
       const expected = list( 
         list(
-          Term('begin'),
-          Nont('BLOCK'),
-          Term('end'),
-          Nont('BLOCK')
+          Term(string('begin')),
+          Nont(string('BLOCK')),
+          Term(string('end')),
+          Nont(string('BLOCK'))
         )
       );
 
-      const sym = Nont('BLOCK');
+      const sym = Nont(string('BLOCK'));
       const actual = assoc(environment, sym);
 
       assert.deepEqual(actual, expected);
@@ -72,7 +72,7 @@ describe('bnf parser', () => {
         tuple(2, 4),
         tuple(3, 6)
       );
-      const actual = mapenv(x => x*2, environment);
+      const actual = mapenv(x => x * 2, environment);
 
       assert.deepEqual(actual, expected);
     });
@@ -89,12 +89,12 @@ describe('bnf parser', () => {
       const test = str => some(bnf(nont, term), str);
 
       const expected = list(
-        tuple(Nont('BLOCK'), list( 
+        tuple(Nont(string('BLOCK')), list(
           list(
-            Term('begin'),
-            Nont('BLOCK'),
-            Term('end'),
-            Nont('BLOCK')
+            Term(string('begin')),
+            Nont(string('BLOCK')),
+            Term(string('end')),
+            Nont(string('BLOCK'))
           ),
           list()
         ))

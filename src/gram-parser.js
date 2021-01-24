@@ -7,7 +7,7 @@ import { assoc } from './bnf-parser';
 
 const uncurriedNode = (symbol, tree) => {
   return {
-    symbol: isArray(symbol) ? symbol.join('') : symbol,
+    symbol: symbol,
     tree: tree
   }
 };

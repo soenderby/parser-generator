@@ -54,24 +54,35 @@ const uncurriedMapenv = (f, environment) => {
  */
 const mapenv = curry(uncurriedMapenv);
 
+/**
+ * Constructor for a terminal token
+ * @constructor
+ * @param value - list of chars
+ * @returns {{type: string, value: *[]}}
+ */
 const Term = value => {
   return {
     type: 'terminal',
-    value: isArray(value) ? value.join('') : value
+    value: value
   }
 }
 
+/**
+ * Constructor for a non-terminal token
+ * @constructor
+ * @param value - list of chars
+ * @returns {{type: string, value: *[]}}
+ */
 const Nont = value => {
   return {
     type: 'nonterminal',
-    value: isArray(value) ? value.join('') : value
+    value: value
   }
 };
 
 /**
  * Parser for grammers written using the bnf formalism
- * 
- * @param {function(string): list} nontp - parser for nonterminals
+ * @param {function(string): list} nontp - parser for non-terminals
  * @param {function(string): list} termp - parser for terminals
  * @param {string} str - Input string
  * @returns {list} - Parser result
@@ -80,7 +91,7 @@ const uncurriedBnf = (nontp, termp, str) => {
   const spsymbol = s => sp(symbol(s));
   const sptoken = t => sp(token(t));
 
-  // Parses a nonterminal and creates the parse tree for it
+  // Parses a non-terminal and creates the parse tree for it
   const nont = (str) => 
     apply(
       Nont, 

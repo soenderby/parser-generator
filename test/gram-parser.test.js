@@ -38,11 +38,11 @@ describe('Gram parser', () => {
       const expected = list(
         tuple(
           string(''),
-          node('s', list())
+          node(string('s'), list())
         )
       );
 
-      const sym = Term('s');
+      const sym = Term(string('s'));
       const actual = parsSym(gram, sym, string('s'));
 
       assert.deepEqual(actual, expected);
@@ -50,24 +50,24 @@ describe('Gram parser', () => {
 
     it('should generate a parser for a non-terminal symbol', () => {
       const gram = list(
-        tuple(Nont('s'),
+        tuple(Nont(string('s')),
          list(
            list(
-             Term('s')
+             Term(string('s'))
             )
           )
         ));
       const expected = list(
         tuple(string(''),
-          node('s', 
+          node(string('s'),
             list(
-              node('s', list())
+              node(string('s'), list())
             )
           )
         )
       );
 
-      const sym = Nont('s');
+      const sym = Nont(string('s'));
       const actual = parsSym(gram, sym, string('s'));
 
       assert.deepEqual(actual, expected);
@@ -78,10 +78,10 @@ describe('Gram parser', () => {
     it('should generate a parser for an alternative', () => {
       const gram = list();
       const expected = list(
-        tuple(string(''), list(node('a', list()), node('b', list())))
+        tuple(string(''), list(node(string('a'), list()), node(string('b'), list())))
       );
 
-      const alt = list(Term('a'), Term('b'));
+      const alt = list(Term(string('a')), Term(string('b')));
       const actual = parsAlt(gram, alt)(string('ab'));
 
       assert.deepEqual(actual, expected);
@@ -92,10 +92,10 @@ describe('Gram parser', () => {
     it('should generate parsers for each alternative and make a choice from them', () => {
       const gram = list();
       const expected = list(
-        tuple(string(''), list(node('s', list())))
+        tuple(string(''), list(node(string('s'), list())))
       );
 
-      const sym = list(list(Term('s')));
+      const sym = list(list(Term(string('s'))));
       const actual = parsRhs(gram, sym)(string('s'));
 
       assert.deepEqual(actual, expected);
@@ -103,14 +103,14 @@ describe('Gram parser', () => {
   });
 
   describe('parsGram', () => {
-    it('should generate parser for the language described by given grammer', () => {
+    it('should generate parser for the language described by given grammar', () => {
       const gram = list(
         tuple(Nont('BLOCK'), list( 
           list(
-            Term('begin'),
-            Nont('BLOCK'),
-            Term('end'),
-            Nont('BLOCK')
+            Term(string('begin')),
+            Nont(string('BLOCK')),
+            Term(string('end')),
+            Nont(string('BLOCK'))
           ),
           list()
         ))
@@ -118,24 +118,24 @@ describe('Gram parser', () => {
       const expected = list(
         tuple(
           string(''),
-          node('BLOCK', 
+          node(string('BLOCK'),
             list(
-              node('begin', list()),
-              node('BLOCK', list()),
-              node('end', list()),
-              node('BLOCK',
+              node(string('begin'), list()),
+              node(string('BLOCK'), list()),
+              node(string('end'), list()),
+              node(string('BLOCK'),
                 list(
-                  node('begin', list()),
-                  node('BLOCK', 
+                  node(string('begin'), list()),
+                  node(string('BLOCK'),
                     list(
-                      node('begin', list()),
-                      node('BLOCK', list()),
-                      node('end', list()),
-                      node('BLOCK', list())
+                      node(string('begin'), list()),
+                      node(string('BLOCK'), list()),
+                      node(string('end'), list()),
+                      node(string('BLOCK'), list())
                     )
                   ),
-                  node('end', list()),
-                  node('BLOCK', list())
+                  node(string('end'), list()),
+                  node(string('BLOCK'), list())
                 )
               )
             )
@@ -143,29 +143,29 @@ describe('Gram parser', () => {
         ),
         tuple(
           string(' begin begin end end'),
-          node('BLOCK', 
+          node(string('BLOCK'),
             list(
-              node('begin', list()),
-              node('BLOCK', list()),
-              node('end', list()),
-              node('BLOCK', list())
+              node(string('begin'), list()),
+              node(string('BLOCK'), list()),
+              node(string('end'), list()),
+              node(string('BLOCK'), list())
             )
           )
         ),
         tuple(
           string('begin end begin begin end end'),
-          node('BLOCK', list())
+          node(string('BLOCK'), list())
         )
       );
 
-      const sym = Nont('BLOCK');
+      const sym = Nont(string('BLOCK'));
       const tokens = list(
-        Term('begin'),
-        Term('end'),
-        Term('begin'),
-        Term('begin'),
-        Term('end'),
-        Term('end')
+        Term(string('begin')),
+        Term(string('end')),
+        Term(string('begin')),
+        Term(string('begin')),
+        Term(string('end')),
+        Term(string('end'))
       );
       const actual = parsGram(gram, sym, string('begin end begin begin end end'));
 
@@ -177,11 +177,11 @@ describe('Gram parser', () => {
       const expected = list(
         tuple(
           string(''),
-          node('s', list())
+          node(string('s'), list())
         )
       );
 
-      const sym = Term('s');
+      const sym = Term(string('s'));
       const actual = parsGram(gram, sym, string('s'));
 
       assert.deepEqual(actual, expected);

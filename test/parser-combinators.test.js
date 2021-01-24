@@ -367,9 +367,11 @@ describe('Parser combinators', () => {
     });
 
     it('should parse a section that is between a start and end delimiter, and return remainder', () => {
-      const inputString = '(pack) remainder';
+      const inputString = string('(pack) remainder');
 
-      const expected = list(tuple(string(' remainder'), string('pack')));
+      const expected = list(
+        tuple(string(' remainder'), string('pack'))
+      );
       const actual = parenthesized(parseToken(string('pack')), inputString);
 
       assert.deepEqual(actual, expected);
@@ -391,16 +393,20 @@ describe('Parser combinators', () => {
     it('should parse a section that is between a start and end delimiter', () => {
       const inputString = string('[pack]');
 
-      const expected = list(tuple(string(''), string('pack')));
+      const expected = list(
+        tuple(string(''), string('pack'))
+      );
       const actual = bracketed(parseToken(string('pack')), inputString);
 
       assert.deepEqual(actual, expected);
     });
 
     it('should parse a section that is between a start and end delimiter, and return remainder', () => {
-      const inputString = '[pack] remainder';
+      const inputString = string('[pack] remainder');
 
-      const expected = list(tuple(string(' remainder'), string('pack')));
+      const expected = list(
+        tuple(string(' remainder'), string('pack'))
+      );
       const actual = bracketed(parseToken(string('pack')), inputString);
 
       assert.deepEqual(actual, expected);

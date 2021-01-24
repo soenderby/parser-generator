@@ -31,6 +31,7 @@ import {
   prepend,
   append
 } from '../src/utils';
+import {flip} from 'ramda';
 
 describe('Utils', () => {
   describe('Data structures', () => {
@@ -176,7 +177,7 @@ describe('Utils', () => {
 
       it('should return the same string if given string', () => {
         const expected = string('abc');
-        const actual = foldl(append, '', string('abc'));
+        const actual = foldl(flip(append), '', string('abc'));
 
         assert.deepEqual(actual, expected);
       });
@@ -190,7 +191,7 @@ describe('Utils', () => {
 
       it('should return the same list if given list', () => {
         const expected = list(1, 2, 3);
-        const actual = foldl(append, list(), list(1, 2, 3));
+        const actual = foldl(flip(append), list(), list(1, 2, 3));
 
         assert.deepEqual(actual, expected);
       });
@@ -203,8 +204,8 @@ describe('Utils', () => {
       });
 
       it('should be able to unparsed sum a list of numbers', () => {
-        const expected = '0 + 1 + 2 + 3';
-        const actual = foldl((a, b) =>  `${a} + ${b}`, 0, list(1, 2, 3));
+        const expected = string('0 + 1 + 2 + 3');
+        const actual = foldl((a, b) =>  concat(a, string(` + ${b}`)), string('0'), list(1, 2, 3));
 
         assert.deepEqual(actual, expected);
       });

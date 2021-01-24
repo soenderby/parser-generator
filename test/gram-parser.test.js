@@ -23,7 +23,9 @@ describe('Gram parser', () => {
         symbol('b'),
         symbol('c')
       );
-      const expected = list(tuple(string(''), string('abc')));
+      const expected = list(
+        tuple(string(''), string('abc')))
+      ;
       const actual = listSequence(parsers)(string('abc'));
 
       assert.deepEqual(actual, expected);

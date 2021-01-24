@@ -210,6 +210,29 @@ const curry = R.curry;
 
 /* List functions */
 /**
+ * Adds an element to the front of a list
+ * @param elem - element to prepend
+ * @param {array | list | string} list
+ * @return {array | list | string}
+ */
+const append = (elem, list) => {
+  if (isArray(list) || isString(list))
+    return R.append(elem, list);
+
+  if (isGenerator(list)) {
+    return function* () {
+      let iterator = list();
+
+      for (const item of iterator)
+        yield item;
+
+      yield  elem;
+    }
+  }
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
+}
+
+/**
  * Concatenates two lists of the same type
  * @param {array | list | string} list1
  * @param {array | list | string} list2
@@ -494,6 +517,28 @@ const nth = (n, obj) => {
 }
 
 /**
+ * Adds an element to the front of a list
+ * @param elem - element to prepend
+ * @param {array | list | string} list
+ * @return {array | list | string}
+ */
+const prepend = (elem, list) => {
+  if (isArray(list) || isString(list))
+    return R.prepend(elem, list);
+
+  if (isGenerator(list)) {
+    return function* () {
+      let iterator = list();
+
+      yield  elem;
+      for (const item of iterator)
+        yield item;
+    }
+  }
+  throw TypeError(`expected obj ${obj} to be array, string or list`);
+}
+
+/**
  * Drops first element in a list
  * @param {array | list | string} obj - list of elements
  * @returns {array | list | string}
@@ -673,5 +718,7 @@ export {
   foldl,
   foldr,
   string,
-  isArray
+  isArray,
+  prepend,
+  append
 }

@@ -28,6 +28,8 @@ import {
   take,
   tuple,
   string,
+  prepend,
+  append
 } from '../src/utils';
 
 describe('Utils', () => {
@@ -165,8 +167,6 @@ describe('Utils', () => {
     });
 
     describe('foldl', () => {
-      const append = (xs, x) => concat(xs, list(x));
-
       it('should return base case for empty string', () => {
         const expected = 'a';
         const actual = foldl(append, 'a', '');
@@ -211,8 +211,6 @@ describe('Utils', () => {
     });
 
     describe('foldr', () => {
-      const prepend = (x, xs) => concat(list(x), xs);
-
       it('should return base case for empty string', () => {
         const expected = 'a';
         const actual = foldr(list, 'a', '');

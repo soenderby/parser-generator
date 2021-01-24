@@ -36,9 +36,12 @@ import {
   drop,
   curry,
   isDigit,
-  string
+  string,
+  concat,
+  append,
+  prepend
 } from '../src/utils';
-import { digit } from '../src/expression-parsers';
+import { apply } from '../src/parser-tranformers';
 
 const parseA = str => (head(str) === 'a') ? list(tuple(tail(str), 'a')) : list();
 
@@ -489,16 +492,17 @@ describe('Parser combinators', () => {
     it('should apply parser for item and separator from left to right', () => {
       const inputString = string('1+2+3 rest');
 
-      const separatorParser = str => list(tuple(drop(1, str), (e1, e2) => string(`(${e1}+${e2})`)));
+      const operation = (e1, e2) =>  concat(append('+', prepend('(', e1)), append(')', e2));
+      const separatorParser = str => list(tuple(drop(1, str), operation));
 
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
       const expected = list(
         tuple(string(' rest'), string('((1+2)+3)')),
         tuple(string('+3 rest'), string('(1+2)')),
-        tuple(string('+2+3 rest'), '1')
+        tuple(string('+2+3 rest'), string('1'))
       );
-      const actual = chainLeft(satisfy(isDigit), separatorParser, inputString);
+      const actual = chainLeft(apply(c => list(c), satisfy(isDigit)), separatorParser, inputString);
 
       assert.deepEqual(actual, expected);
     });
@@ -508,17 +512,18 @@ describe('Parser combinators', () => {
     it('should apply parser for item and separator from right to left', () => {
       const inputString = string('1+2+3 rest');
 
-      const separatorParser = str => list(tuple(drop(1, str), (e1, e2) => string(`(${e1}+${e2})`)));
+      const operation = (e1, e2) =>  concat(append('+', prepend('(', e1)), append(')', e2));
+      const separatorParser = str => list(tuple(drop(1, str), operation));
 
       // The parser for the separator should return a function that combines parse trees
       // So it should define an operation and not a token
       const expected = list(
         tuple(string(' rest'), string('(2+(3+1))')),
         tuple(string('+3 rest'), string('(2+1)')),
-        tuple(string('+2+3 rest'), '1')
+        tuple(string('+2+3 rest'), string('1'))
       );
-      const actual = chainRight(satisfy(isDigit), separatorParser, inputString);
-
+      const actual = chainRight(apply(c => list(c), satisfy(isDigit)), separatorParser, inputString);
+      // digit as parser
       assert.deepEqual(actual, expected);
     });
   });

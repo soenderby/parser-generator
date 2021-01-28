@@ -105,7 +105,7 @@ describe('Gram parser', () => {
   describe('parsGram', () => {
     it('should generate parser for the language described by given grammar', () => {
       const gram = list(
-        tuple(Nont('BLOCK'), list( 
+        tuple(Nont(string('BLOCK')), list( 
           list(
             Term(string('begin')),
             Nont(string('BLOCK')),

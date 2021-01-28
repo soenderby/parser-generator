@@ -130,6 +130,13 @@ describe('Utils', () => {
 
         assert.deepEqual(actual, expected);
       });
+
+      it('should pppend empty list if given list with empty list', () => {
+        const expected = list(1, 2, list());
+        const actual = concat(list(1, 2), list(list()));
+
+        assert.deepEqual(actual, expected);
+      });
     });
 
     describe('drop', () => {

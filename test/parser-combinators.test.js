@@ -103,7 +103,7 @@ describe('Parser combinators', () => {
 
     // This is a test that should be run if the implementation of failing is changed
     
-    it('given parsers where only one succeeds, should both results', () => {
+    it('given parsers where only one succeeds, should return both results', () => {
       const parseOneItem = str => list(tuple(tail(str), head(str)));
       const failingParser = str => list(tuple(str, '' ));
 
@@ -127,6 +127,15 @@ describe('Parser combinators', () => {
         tuple('nput', 'i')
       );
       const actual = alternation(parseOneItem, fail, inputString);
+
+      assert.deepEqual(actual, expected);
+    });
+
+    it('should return empty list given parser that return empty', () => {
+      const testParser = (str) => list();
+
+      const expected = list();
+      const actual = alternation(testParser, testParser, '');
 
       assert.deepEqual(actual, expected);
     });

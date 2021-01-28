@@ -1,7 +1,7 @@
-import { concat, curry, fst, head, isEmpty, list, map, snd, tail, tuple } from './utils';
+import { concat, curry, fst, head, isEmpty, list, listToArray, map, snd, tail, tuple } from './utils';
 import { symbol, token } from './elementary-parsers';
 import { apply, sp } from './parser-tranformers';
-import { alternation, listOf, many, seqKeepFirst, seqKeepSecond, sequence } from './parser-combinators';
+import { alternation, listOf, many, seqKeepFirst, seqKeepSecond, sequence, many1 } from './parser-combinators';
 
 /* Environment */
 const env = (a, b) => list(tuple(a, b));
@@ -96,7 +96,10 @@ const uncurriedBnf = (nontp, termp, str) => {
       str
     );
 
-  const alt = (str) =>  
+  // When a parser in alternation returns an empty list, it is simply skipped
+  // This is an issue, as this should be able to return an empty alternative
+  // This might not be the only reason bnf is not working correctly
+  const alt = (str) => 
     many(
       alternation(term, nont),
       str

@@ -75,8 +75,8 @@ const uncurriedSome = (p, str) => {
   return compose(
     snd,
     head,
-    just(p)
-  )(str);
+    just
+  )(p, str);
 }
 /** @see uncurriedSome */
 const some = curry(uncurriedSome);

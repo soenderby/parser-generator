@@ -7,13 +7,15 @@ import { assoc, bnf } from './bnf-parser';
 import { parsGram } from './gram-parser';
 
 // Should return a parser for a language
+// The parser given to the the inner some accepts a string parameter that is not used,
+// This is due to the fact that the just parser needs a string parameter, and passes 
+// this parameter to the parser, so it expects the parser to accept a string
 const uncurriedParsGen = (nontp, termp, bnfstring, start, str) => {
-  return some(
-    apply(
+  return some(some(str => apply(
       gram => parsGram(gram, start),
       bnf(nontp, termp),
       bnfstring
-    ), str)
+    ), ''))(str)
 };
 
 const parsGen = curry(uncurriedParsGen);

@@ -83,7 +83,7 @@ const some = curry(uncurriedSome);
 
 /**
  * Yields the first possible result of a parser, or an empty list
- * 
+ *
  * @param {function(string): list} p - parser to transform
  * @param {string} str - input string
  * @returns {list} parser result

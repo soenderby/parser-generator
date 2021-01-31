@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { Nont } from '../src/bnf-parser';
+import { Nont, Term } from '../src/bnf-parser';
 import { satisfy } from '../src/elementary-parsers';
 import { node } from '../src/gram-parser';
 import { greedy1 } from '../src/parser-combinators';
@@ -13,20 +13,20 @@ describe('parsGen', function() {
     const nontp = str => greedy1(satisfy(x => /[A-Z]+/.test(x)), str);
     const termp = str => greedy1(satisfy(x => /[a-z]+/.test(x)), str);
 
-    const expected = node(string('BLOCK'), list(
-      node(string('begin'), list()),
-      node(string('BLOCK'), list()),
-      node(string('end'), list()),
-      node(string('BLOCK'), list(
-        node(string('begin'), list()),
-        node(string('BLOCK'), list(
-          node(string('begin'), list()),
-          node(string('BLOCK'), list()),
-          node(string('end'), list()),
-          node(string('BLOCK'), list())
+    const expected = node(Nont(string('BLOCK')), list(
+      node(Term(string('begin')), list()),
+      node(Nont(string('BLOCK')), list()),
+      node(Term(string('end')), list()),
+      node(Nont(string('BLOCK')), list(
+        node(Term(string('begin')), list()),
+        node(Nont(string('BLOCK')), list(
+          node(Term(string('begin')), list()),
+          node(Nont(string('BLOCK')), list()),
+          node(Term(string('end')), list()),
+          node(Nont(string('BLOCK')), list())
         )),
-        node(string('end'), list()),
-        node(string('BLOCK'), list())
+        node(Term(string('end')), list()),
+        node(Nont(string('BLOCK')), list())
       ))
     ));
 

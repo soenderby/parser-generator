@@ -3,7 +3,7 @@ import { succeed, symbol, token } from './elementary-parsers';
 import { apply, sp } from './parser-tranformers';
 import { alternation, choice, listOf, many, seqKeepFirst, seqKeepSecond, sequence } from './parser-combinators';
 import { constant } from './expression-parsers';
-import { assoc } from './bnf-parser';
+import { assoc, Nont, Term } from './bnf-parser';
 
 const uncurriedNode = (symbol, tree) => {
   return {
@@ -38,11 +38,11 @@ const uncurriedParsSym = (gram, sym, symbols) => {
 
   if(sym.type === 'terminal') {
     // Possible this should use token instead of symbol
-    return apply(node(s), apply(x => list(), sptoken(s)), symbols);
+    return apply(node(Term(s)), apply(x => list(), sptoken(s)), symbols);
   }
 
   if(sym.type === 'nonterminal') {
-    return apply(node(s), parsRhs(gram, assoc(gram, sym)), symbols);
+    return apply(node(Nont(s)), parsRhs(gram, assoc(gram, sym)), symbols);
   }
 };
 

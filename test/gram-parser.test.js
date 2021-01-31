@@ -38,7 +38,7 @@ describe('Gram parser', () => {
       const expected = list(
         tuple(
           string(''),
-          node(string('s'), list())
+          node(Term(string('s')), list())
         )
       );
 
@@ -59,9 +59,9 @@ describe('Gram parser', () => {
         ));
       const expected = list(
         tuple(string(''),
-          node(string('s'),
+          node(Nont(string('s')),
             list(
-              node(string('s'), list())
+              node(Term(string('s')), list())
             )
           )
         )
@@ -78,7 +78,12 @@ describe('Gram parser', () => {
     it('should generate a parser for an alternative', () => {
       const gram = list();
       const expected = list(
-        tuple(string(''), list(node(string('a'), list()), node(string('b'), list())))
+        tuple(string(''),
+          list(
+            node(Term(string('a')), list()),
+            node(Term(string('b')), list())
+          )
+        )
       );
 
       const alt = list(Term(string('a')), Term(string('b')));
@@ -92,7 +97,7 @@ describe('Gram parser', () => {
     it('should generate parsers for each alternative and make a choice from them', () => {
       const gram = list();
       const expected = list(
-        tuple(string(''), list(node(string('s'), list())))
+        tuple(string(''), list(node(Term(string('s')), list())))
       );
 
       const sym = list(list(Term(string('s'))));
@@ -118,24 +123,24 @@ describe('Gram parser', () => {
       const expected = list(
         tuple(
           string(''),
-          node(string('BLOCK'),
+          node(Nont(string('BLOCK')),
             list(
-              node(string('begin'), list()),
-              node(string('BLOCK'), list()),
-              node(string('end'), list()),
-              node(string('BLOCK'),
+              node(Term(string('begin')), list()),
+              node(Nont(string('BLOCK')), list()),
+              node(Term(string('end')), list()),
+              node(Nont(string('BLOCK')),
                 list(
-                  node(string('begin'), list()),
-                  node(string('BLOCK'),
+                  node(Term(string('begin')), list()),
+                  node(Nont(string('BLOCK')),
                     list(
-                      node(string('begin'), list()),
-                      node(string('BLOCK'), list()),
-                      node(string('end'), list()),
-                      node(string('BLOCK'), list())
+                      node(Term(string('begin')), list()),
+                      node(Nont(string('BLOCK')), list()),
+                      node(Term(string('end')), list()),
+                      node(Nont(string('BLOCK')), list())
                     )
                   ),
-                  node(string('end'), list()),
-                  node(string('BLOCK'), list())
+                  node(Term(string('end')), list()),
+                  node(Nont(string('BLOCK')), list())
                 )
               )
             )
@@ -143,18 +148,18 @@ describe('Gram parser', () => {
         ),
         tuple(
           string(' begin begin end end'),
-          node(string('BLOCK'),
+          node(Nont(string('BLOCK')),
             list(
-              node(string('begin'), list()),
-              node(string('BLOCK'), list()),
-              node(string('end'), list()),
-              node(string('BLOCK'), list())
+              node(Term(string('begin')), list()),
+              node(Nont(string('BLOCK')), list()),
+              node(Term(string('end')), list()),
+              node(Nont(string('BLOCK')), list())
             )
           )
         ),
         tuple(
           string('begin end begin begin end end'),
-          node(string('BLOCK'), list())
+          node(Nont(string('BLOCK')), list())
         )
       );
 
@@ -177,7 +182,7 @@ describe('Gram parser', () => {
       const expected = list(
         tuple(
           string(''),
-          node(string('s'), list())
+          node(Term(string('s')), list())
         )
       );
 

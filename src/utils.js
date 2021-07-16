@@ -9,15 +9,6 @@ import * as chai from 'chai';
  */
 const list = (...args) => {
   return args;
-  /*
-  if (args.length > 0 && args.every(isString))
-    return args.join('');
-
-  return function* () {
-    for (const arg of args) {
-      yield arg
-    }
-  }*/
 }
 
 /**
@@ -84,11 +75,6 @@ const tuple = (...args) => {
  */
 const string = chars => {
   return [...chars]
-  /*return function* () {
-    for (const char of chars) {
-      yield char;
-    }
-  }*/
 }
 
 /* Data types (duck typing) */
@@ -139,8 +125,6 @@ const isDigit = c => {
 
   return c === '0' || c === '1' || c === '2' || c === '3' || c === '4' || c === '5' || c === '6' || c === '7' || c === '8' || c === '9';
 }
-
-const isGenerator = obj => obj !== null && obj !== undefined && obj.constructor.name === 'GeneratorFunction';
 
 /**
  * Determines whether or not obj is a list
@@ -219,16 +203,6 @@ const append = (elem, list) => {
   if (isArray(list) || isString(list))
     return R.append(elem, list);
 
-  if (isGenerator(list)) {
-    return function* () {
-      let iterator = list();
-
-      for (const item of iterator)
-        yield item;
-
-      yield  elem;
-    }
-  }
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
@@ -244,17 +218,6 @@ const concat = (list1, list2) => {
 
   if (isString(list1) && isString(list2))
     return list(list1, list2);
-
-  if (isGenerator(list1) && isGenerator(list2)){
-    return function* () {
-      for (const item of list1()) {
-        yield item;
-      }
-      for (const item of list2()) {
-        yield item;
-      }
-    }
-  }
 
   throw TypeError(`cannot concat list1 ${list1} and list2 ${list2}`);
 }
@@ -272,19 +235,6 @@ const drop = (n, list) => {
   if (isArray(list) || isString(list))
     return R.drop(n, list);
 
-  if (isGenerator(list)){
-    return function* () {
-      let iterator = list();
-
-      for (let i = 0; i < n; i++) {
-        if (iterator.next().done)
-          break;
-      }
-      for (const item of iterator) {
-        yield item;
-      }
-    }
-  }
   throw TypeError(`expected list ${list} to be array, string or list`);
 }
 
@@ -301,25 +251,6 @@ const dropWhile = (f, list) => {
   if (isArray(list) || isString(list))
     return R.dropWhile(f, list);
 
-  if (isGenerator(list)){
-    return function* () {
-      let iterator = list();
-
-      while(true) {
-        let iteration = iterator.next();
-        let isSatisfied = f(iteration.value);
-
-        if (!isBoolean(isSatisfied))
-          throw TypeError('expected f to return boolean');
-
-        if (!isSatisfied || iteration.done)
-          break;
-      }
-      for (const item of iterator) {
-        yield item;
-      }
-    }
-  }
   throw TypeError(`expected list ${list} to be array, string or list`);
 }
 
@@ -335,13 +266,6 @@ const map = (f, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 
-  if (isGenerator(list)){
-    return function* () {
-      for (let item of list()) {
-        yield f(item);
-      }
-    }
-  }
   return R.map(f, list);
 }
 
@@ -359,18 +283,6 @@ const fmap = (f, obj) =>  {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 
-  if (isGenerator(obj)) {
-    return function* () {
-      for (let item of obj()) {
-        let result = f(item);
-
-        if (!isGenerator(result))
-          throw TypeError(`expected f ${f} to return a list when obj is a list`);
-
-        yield* result();
-      }
-    }
-  }
   return R.chain(f, obj);
 }
 
@@ -384,19 +296,6 @@ const filter = (f, obj) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
 
-  if (isGenerator(obj)) {
-    return function* () {
-      for (let item of obj()) {
-        let result = f(item);
-
-        if (!isBoolean(result))
-          throw TypeError(`expected f ${f} to return a boolean`);
-
-        if(result)
-          yield item;
-      }
-    }
-  }
   return R.filter(f, obj);
 }
 
@@ -432,7 +331,7 @@ const foldl = curry(uncurriedFoldl);
 const uncurriedFoldr = (f, z, list) => {
   if (!isFunction(f))
     throw TypeError(`expected f ${f} to be a function`);
-  if (!isArray(list) && !isGenerator(list) && !isString(list))
+  if (!isArray(list) && !isString(list))
     throw TypeError(`expected list ${list} to be a array, list or string`);
 
   const x = head(list);
@@ -453,9 +352,6 @@ const isEmpty = (obj) => {
   if (isString(obj) || isArray(obj))
     return R.isEmpty(obj);
 
-  if (isGenerator(obj))
-    return obj().next().done;
-
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
@@ -474,9 +370,6 @@ const isNonEmpty = obj => !isEmpty(obj);
 const head = (obj) => {
   if (isArray(obj) || isString(obj))
     return R.head(obj);
-
-  if (isGenerator(obj))
-    return obj().next().value;
 
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
@@ -497,22 +390,6 @@ const nth = (n, obj) => {
   if (isArray(obj) || isString(obj))
     return R.nth(n, obj);
 
-  if (isGenerator(obj)){
-    let iterator = obj();
-    let i = 0;
-
-    while(true) {
-      let iteration = iterator.next();
-
-      if (iteration.done)
-        return undefined;
-
-      if (i === n)
-        return iteration.value;
-
-      i++;
-    }
-  }
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
@@ -526,15 +403,6 @@ const prepend = (elem, list) => {
   if (isArray(list) || isString(list))
     return R.prepend(elem, list);
 
-  if (isGenerator(list)) {
-    return function* () {
-      let iterator = list();
-
-      yield  elem;
-      for (const item of iterator)
-        yield item;
-    }
-  }
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
@@ -547,16 +415,6 @@ const tail = (obj) => {
   if (isArray(obj) || isString(obj))
     return R.tail(obj);
 
-  if (isGenerator(obj)) {
-    return function* () {
-      let iterator = obj();
-
-      iterator.next();
-
-      for (const item of iterator)
-        yield item;
-    }
-  }
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
@@ -573,19 +431,6 @@ const take = (n, obj) => {
   if (isArray(obj) || isString(obj))
     return R.take(n, obj);
 
-  if (isGenerator(obj)){
-    return function* () {
-      let iterator = obj();
-
-      for (let i = 0; i < n; i++) {
-        let iteration = iterator.next();
-
-        if (iteration.done)
-          break;
-        else yield iteration.value;
-      }
-    }
-  }
   throw TypeError(`expected obj ${obj} to be array, string or list`);
 }
 
@@ -599,18 +444,7 @@ const take = (n, obj) => {
 const listToArray = (list, maxLength = 100) => {
   let array = [];
 
-  if (isGenerator(list)){
-    const iterator = list.apply();
-
-    for (let i = 0; i < maxLength; i++) {
-      let iteration = iterator.next();
-
-      if (iteration.done)
-        break;
-      else array.push(iteration.value);
-    }
-  }
-  else if(isArray(list))
+  if(isArray(list))
     array = list;
   else throw new Error('list was expected to be array or generator');
 
@@ -630,8 +464,6 @@ const listToArrayRecursively = (obj, maxLength = 100, depth = 0) => {
   if (depth > 10)
     return obj;
 
-  if (isGenerator(obj))
-    return listToArray(obj).map(func);
   if (isArray(obj))
     return obj.map(func);
   else if (typeof obj === 'object') {

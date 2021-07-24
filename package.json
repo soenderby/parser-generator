@@ -25,5 +25,16 @@
     "chai": "^4.3.4",
     "chai-almost": "^1.0.1",
     "mocha": "^8.4.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soenderby/parser-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/soenderby/parser-generator/issues"
+  },
+  "homepage": "https://github.com/soenderby/parser-generator#readme"
 }

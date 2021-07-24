@@ -1,5 +1,5 @@
 {
-  "name": "parser-generator",
+  "name": "@soenderby/parser-generator",
   "version": "1.0.0",
   "description": "parser generator using parser combinators",
   "main": "index.js",

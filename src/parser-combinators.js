@@ -18,7 +18,7 @@ import {
   otherwise,
   emptyList, isList,
   isString, isTuple
-} from './utils';
+} from '@soenderby/functional-utils';
 
 /**
  * Execute two parsers in sequence. The second is applied to the remainder of the first

@@ -1,6 +1,6 @@
 import * as chai from 'chai';
 import { assert, expect } from 'chai';
-import { list, tuple, map, head, snd, take, nth, drop, string } from '../src/utils';
+import { list, tuple, map, head, snd, take, nth, drop, string } from '@soenderby/functional-utils';
 import {
   digit,
   natural,

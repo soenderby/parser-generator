@@ -30,7 +30,7 @@ import {
   map,
   nth,
   isArray
-} from './utils';
+} from '@soenderby/functional-utils';
 import {always, flip, identity, negate} from "ramda";
 
 /**

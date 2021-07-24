@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { list, concat, tuple, head, string } from '../src/utils';
+import { list, concat, tuple, head, string } from '@soenderby/functional-utils';
 import { env, assoc, mapenv, bnf, Term, Nont } from '../src/bnf-parser';
 import { apply, some, sp } from '../src/parser-tranformers';
 import { greedy1 } from '../src/parser-combinators';

@@ -1,4 +1,4 @@
-import { concat, curry, foldr, fst, head, isEmpty, list, map, snd, tail, tuple, isArray, append, prepend, string } from './utils';
+import { concat, curry, foldr, fst, head, isEmpty, list, map, snd, tail, tuple, isArray, append, prepend, string } from '@soenderby/functional-utils';
 import { succeed, symbol, token } from './elementary-parsers';
 import { apply, sp } from './parser-tranformers';
 import { alternation, choice, listOf, many, seqKeepFirst, seqKeepSecond, sequence } from './parser-combinators';

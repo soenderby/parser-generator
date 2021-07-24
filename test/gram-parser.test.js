@@ -3,7 +3,7 @@ import { env, Nont, Term } from '../src/bnf-parser';
 import { symbol } from '../src/elementary-parsers';
 import { constant } from '../src/expression-parsers';
 import { concatSequence, listSequence, node, parsAlt, parsGram, parsRhs, parsSym } from '../src/gram-parser';
-import { list, tuple, string } from '../src/utils';
+import { list, tuple, string } from '@soenderby/functional-utils';
 
 describe('Gram parser', () => {
   describe('concatSequence', () => {

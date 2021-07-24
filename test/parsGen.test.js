@@ -4,7 +4,7 @@ import { satisfy } from '../src/elementary-parsers';
 import { node } from '../src/gram-parser';
 import { greedy1 } from '../src/parser-combinators';
 import { parsGen } from '../src/parsGen';
-import { list, string } from '../src/utils';
+import { list, string } from '@soenderby/functional-utils';
 
 describe('parsGen', function() {
   this.timeout(10000)

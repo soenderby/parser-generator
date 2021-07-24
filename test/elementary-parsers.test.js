@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import { epsilon, fail, satisfy, succeed, symbol, symbola, token } from '../src/elementary-parsers';
-import {list, string, tuple} from '../src/utils';
+import {list, string, tuple} from '@soenderby/functional-utils';
 
 describe('Elementary parsers', () => {
   describe('epsilon', () => {

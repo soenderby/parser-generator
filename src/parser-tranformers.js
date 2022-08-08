@@ -1,5 +1,5 @@
 import {curry, compose } from 'ramda';
-import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction, equals, list, string } from '@soenderby/functional-utils';
+import { tuple, map, snd, head, filter, isEmpty, dropWhile, fst, isFunction, equals, list, string } from './utils';
 
 /**
  * drops initial spaces from input string, and then applies a

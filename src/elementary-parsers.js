@@ -8,7 +8,7 @@ import {
   drop,
   curry,
   equals
-} from '@soenderby/functional-utils'
+} from './utils';
 
 /**
  * This parser only parses the symbol 'a'

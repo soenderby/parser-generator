@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import {sp, just, apply, some, optionalApply, first} from '../src/parser-tranformers';
-import { list, tuple, drop, take, string, map } from '@soenderby/functional-utils';
+import { list, tuple, drop, take, string, map } from '../src/utils';
 import { symbol, token } from '../src/elementary-parsers';
 import { listOf, many, sequence } from '../src/parser-combinators';
 import {identity} from "ramda";

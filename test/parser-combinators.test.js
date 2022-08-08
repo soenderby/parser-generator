@@ -40,7 +40,7 @@ import {
   concat,
   append,
   prepend
-} from '@soenderby/functional-utils';
+} from '../src/utils';
 import { apply } from '../src/parser-tranformers';
 
 const parseA = str => (head(str) === 'a') ? list(tuple(tail(str), 'a')) : list();
